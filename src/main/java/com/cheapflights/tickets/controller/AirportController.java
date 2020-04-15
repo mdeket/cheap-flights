@@ -7,6 +7,7 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController
@@ -20,7 +21,7 @@ public class AirportController {
     }
 
     @GetMapping
-    public List<Airport> getMovieTitles() {
+    public List<Airport> getAirports() {
         return IteratorUtils.toList(airportRepository.findAll().iterator());
     }
 }
