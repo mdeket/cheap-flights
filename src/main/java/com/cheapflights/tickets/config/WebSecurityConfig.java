@@ -1,5 +1,8 @@
-package com.cheapflights.tickets.config.security;
+package com.cheapflights.tickets.config;
 
+import com.cheapflights.tickets.config.security.JwtAuthenticationEntryPoint;
+import com.cheapflights.tickets.config.security.JwtRequestFilter;
+import com.cheapflights.tickets.config.security.JwtUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,7 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/authenticate").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll() //authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
