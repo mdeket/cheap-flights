@@ -23,10 +23,7 @@ public class Airport {
     private String city;
     private String country;
 
-    // TODO: Can this be optional?
     private String iata;
-
-    // TODO: Can this be optional?
     private String icao;
     private BigDecimal latitude;
     private BigDecimal longitude;
