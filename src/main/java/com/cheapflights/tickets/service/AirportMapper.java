@@ -3,6 +3,7 @@ package com.cheapflights.tickets.service;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 
 @Component

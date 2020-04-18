@@ -7,4 +7,5 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableNeo4jRepositories(basePackages = "com.cheapflights.tickets.repository.graph")
 @EnableTransactionManagement
-public class GraphDbConfig {}
+public class GraphDbConfig {
+}

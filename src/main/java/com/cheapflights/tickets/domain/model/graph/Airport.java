@@ -1,14 +1,14 @@
 package com.cheapflights.tickets.domain.model.graph;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
-
+import org.neo4j.ogm.annotation.Relationship;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NodeEntity
@@ -33,5 +33,9 @@ public class Airport {
     // TODO: Convert to ENUM
     private String dst;
     private String timezoneOlson;
+
+    @JsonIgnoreProperties("airports")
+    @Relationship(type = "ROUTE_TO")
+    private List<Airport> airports;
 
 }

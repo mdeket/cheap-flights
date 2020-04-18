@@ -34,20 +34,11 @@
 			<version>3.5.17</version>
 			<scope>runtime</scope>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.neo4j</groupId>-->
-<!--			<artifactId>neo4j-bolt</artifactId>-->
-<!--			<version>4.0.3</version>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-ogm-embedded-driver</artifactId>
 			<version>3.2.10</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.neo4j</groupId>-->
-<!--			<artifactId>neo4j-ogm-bolt-driver</artifactId>-->
-<!--		</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
