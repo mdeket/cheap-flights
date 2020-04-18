@@ -41,6 +41,16 @@ public class ImportDataService implements CommandLineRunner {
         this.airportMapByIcao = new HashMap<>();
     }
 
+    @Override
+    public void run(String... args) {
+        log.info("Started importing data.");
+//        airportRepository.deleteAll();
+//        routeRepository.deleteAll();
+//        loadAirports();
+//        loadRoutes();
+        log.info("Finished importing data.");
+    }
+
     @Transactional
     public void loadAirports() {
         log.info("Loading airports...");
@@ -74,16 +84,6 @@ public class ImportDataService implements CommandLineRunner {
         }
 
         log.info(String.format("Successfully loaded airports in %s seconds.", elapsedTimeInSecond));
-    }
-
-    @Override
-    public void run(String... args) {
-        log.info("Started importing data.");
-        airportRepository.deleteAll();
-        routeRepository.deleteAll();
-        loadAirports();
-        loadRoutes();
-        log.info("Finished importing data.");
     }
 
     @Transactional
