@@ -1,5 +1,6 @@
 package com.cheapflights.tickets.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Builder
 @Data
@@ -27,4 +29,8 @@ public class City {
 
     @Size(max = 2000, message = "Description must be between 0 and 2000 chars.")
     private String description;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "city", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private List<Comment> comments;
 }

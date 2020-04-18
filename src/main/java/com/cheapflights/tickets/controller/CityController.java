@@ -1,9 +1,12 @@
 package com.cheapflights.tickets.controller;
 
 import com.cheapflights.tickets.domain.dto.CityDTO;
+import com.cheapflights.tickets.domain.dto.CommentDTO;
 import com.cheapflights.tickets.domain.model.City;
+import com.cheapflights.tickets.domain.model.Comment;
 import com.cheapflights.tickets.repository.CityRepository;
 import com.cheapflights.tickets.service.CityMapper;
+import com.cheapflights.tickets.service.CommentService;
 import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +21,12 @@ public class CityController {
 
     private final CityRepository cityRepository;
     private final CityMapper cityMapper;
+    private final CommentService commentService;
 
-    public CityController(CityRepository cityRepository, CityMapper cityMapper) {
+    public CityController(CityRepository cityRepository, CityMapper cityMapper, CommentService commentService) {
         this.cityRepository = cityRepository;
         this.cityMapper = cityMapper;
+        this.commentService = commentService;
     }
 
     @GetMapping
@@ -42,6 +47,11 @@ public class CityController {
         final City city = cityMapper.toEntity(cityDTO);
         City persistedCity = cityRepository.save(city);
         return ResponseEntity.status(HttpStatus.CREATED).body(cityMapper.toDTO(persistedCity));
+    }
+
+    @PostMapping("/{cityId}/comment")
+    public ResponseEntity<CommentDTO> addCity(@RequestBody CommentDTO commentDTO, @PathVariable Long cityId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, 1l, cityId));
     }
 
 }

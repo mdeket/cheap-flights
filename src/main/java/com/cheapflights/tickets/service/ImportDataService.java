@@ -1,7 +1,9 @@
 package com.cheapflights.tickets.service;
 
+import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import com.cheapflights.tickets.domain.model.graph.Route;
+import com.cheapflights.tickets.repository.UserRepository;
 import com.cheapflights.tickets.repository.graph.AirportRepository;
 import com.cheapflights.tickets.repository.graph.RouteRepository;
 import lombok.extern.java.Log;
@@ -25,15 +27,17 @@ public class ImportDataService implements CommandLineRunner {
 
     private final AirportRepository airportRepository;
     private final RouteRepository routeRepository;
+    private final UserRepository userRepository;
     private final AirportMapper airportMapper;
     private final RouteMapper routeMapper;
     private final Map<Long, Airport> airportMapByExternalId;
     private final Map<String, Airport> airportMapByIata;
     private final Map<String, Airport> airportMapByIcao;
 
-    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
+    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, UserRepository userRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
         this.airportRepository = airportRepository;
         this.routeRepository = routeRepository;
+        this.userRepository = userRepository;
         this.airportMapper = airportMapper;
         this.routeMapper = routeMapper;
         this.airportMapByExternalId = new HashMap<>();
@@ -48,7 +52,15 @@ public class ImportDataService implements CommandLineRunner {
 //        routeRepository.deleteAll();
 //        loadAirports();
 //        loadRoutes();
+        loadUser();
         log.info("Finished importing data.");
+    }
+
+    private void loadUser() {
+        User user = new User();
+        user.setUsername("miland");
+        user.setPassword("test");
+        userRepository.save(user);
     }
 
     @Transactional
