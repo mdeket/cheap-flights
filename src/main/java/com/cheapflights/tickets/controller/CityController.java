@@ -21,12 +21,10 @@ public class CityController {
 
     private final CityRepository cityRepository;
     private final CityMapper cityMapper;
-    private final CommentService commentService;
 
-    public CityController(CityRepository cityRepository, CityMapper cityMapper, CommentService commentService) {
+    public CityController(CityRepository cityRepository, CityMapper cityMapper) {
         this.cityRepository = cityRepository;
         this.cityMapper = cityMapper;
-        this.commentService = commentService;
     }
 
     @GetMapping
@@ -48,10 +46,4 @@ public class CityController {
         City persistedCity = cityRepository.save(city);
         return ResponseEntity.status(HttpStatus.CREATED).body(cityMapper.toDTO(persistedCity));
     }
-
-    @PostMapping("/{cityId}/comment")
-    public ResponseEntity<CommentDTO> addCity(@RequestBody CommentDTO commentDTO, @PathVariable Long cityId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, 1l, cityId));
-    }
-
 }
