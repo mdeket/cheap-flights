@@ -27,7 +27,8 @@ public class City {
     @Size(min = 1, max = 100, message = "Name must be between 1 and 100 chars.")
     private String name;
 
-    @Size(max = 2000, message = "Description must be between 0 and 2000 chars.")
+    @NotNull
+    @Size(min = 1, max = 2000, message = "Description must be between 0 and 2000 chars.")
     private String description;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "city", cascade = CascadeType.REMOVE)
