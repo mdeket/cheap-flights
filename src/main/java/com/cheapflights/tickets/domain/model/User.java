@@ -1,12 +1,17 @@
 package com.cheapflights.tickets.domain.model;
 
+import com.cheapflights.tickets.config.security.AuthorityConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,11 +22,42 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
+
+    @NotNull
+    @Size(min = 4, max = 50)
     private String username;
-    @Column
+
+    @NotNull
+    @Size(min = 1, max = 30)
+    private String firstName;
+
+    @NotNull
+    @Size(min = 1, max = 30)
+    private String lastName;
+
+
+    @NotNull
+    @Size(min = 1, max = 50)
+    @Email
+    private String email;
+
+    @NotNull
+    @Size(min = 4, max = 128)
     @JsonIgnore
     private String password;
+
+    @NotNull
+    @Size(min = 1, max = 100)
+    @JsonIgnore
+    private String salt;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private AuthorityConstants role;
+
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE, mappedBy = "author")
+    @JsonIgnore
+    private List<Comment> comments;
 
     public String getUsername() {
         return username;

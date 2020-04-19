@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS comment(
    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   user INT NOT NULL,
+   author INT NOT NULL,
    city INT NOT NULL,
    text TEXT NOT NULL,
    timestamp DATETIME NOT NULL,
-   FOREIGN KEY (user) REFERENCES user(id),
+   FOREIGN KEY (author) REFERENCES user(id),
    FOREIGN KEY (city) REFERENCES city(id)
 );

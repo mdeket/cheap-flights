@@ -1,5 +1,6 @@
 package com.cheapflights.tickets.service;
 
+import com.cheapflights.tickets.config.security.AuthorityConstants;
 import com.cheapflights.tickets.domain.model.City;
 import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
@@ -53,11 +54,12 @@ public class ImportDataService implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Started importing data.");
+        userRepository.deleteAll();
         cityRepository.deleteAll();
         airportRepository.deleteAll();
         routeRepository.deleteAll();
         loadAirports();
-        loadRoutes();
+//        loadRoutes();
         loadCities(airportRepository.findAll());
         loadUser();
         log.info("Finished importing data.");
@@ -66,7 +68,12 @@ public class ImportDataService implements CommandLineRunner {
     private void loadUser() {
         User user = new User();
         user.setUsername("miland");
+        user.setEmail("milandeket@gmail.com");
         user.setPassword("test");
+        user.setFirstName("Milan");
+        user.setLastName("Deket");
+        user.setSalt("1233213123");
+        user.setRole(AuthorityConstants.ROLE_ADMIN);
         userRepository.save(user);
     }
 

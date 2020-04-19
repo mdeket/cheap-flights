@@ -38,12 +38,12 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO){
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, 1l));
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, 4l));
     }
 
     @PutMapping
     public ResponseEntity<CommentDTO> updateComment(@RequestBody CommentDTO commentDTO) {
-        return ResponseEntity.ok(commentService.update(commentDTO, 1l));
+        return ResponseEntity.ok(commentService.update(commentDTO, 4l));
     }
 
     @DeleteMapping("/{commentId}")

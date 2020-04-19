@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = "comments")
-@Entity
+@Entity(name = "city")
 @Table(name = "city")
 public class City {
 

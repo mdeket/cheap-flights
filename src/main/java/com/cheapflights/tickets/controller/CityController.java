@@ -1,12 +1,9 @@
 package com.cheapflights.tickets.controller;
 
 import com.cheapflights.tickets.domain.dto.CityDTO;
-import com.cheapflights.tickets.domain.dto.CommentDTO;
 import com.cheapflights.tickets.domain.model.City;
-import com.cheapflights.tickets.domain.model.Comment;
 import com.cheapflights.tickets.repository.CityRepository;
 import com.cheapflights.tickets.service.CityMapper;
-import com.cheapflights.tickets.service.CommentService;
 import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +25,7 @@ public class CityController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<CityDTO>> getAllCities() {
+    public ResponseEntity<Collection<CityDTO>> getAllCities(@RequestParam(required = false) Integer comments) {
         Collection<City> cities = IteratorUtils.toList(cityRepository.findAll().iterator());
         return ResponseEntity.ok().body(cityMapper.toDTO(cities));
     }
