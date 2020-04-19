@@ -1,6 +1,5 @@
 package com.cheapflights.tickets.service;
 
-import com.cheapflights.tickets.domain.dto.CityDTO;
 import com.cheapflights.tickets.domain.model.City;
 import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
@@ -13,9 +12,9 @@ import lombok.extern.java.Log;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
@@ -75,12 +74,12 @@ public class ImportDataService implements CommandLineRunner {
     private void loadCities(Iterable<Airport> airports) {
         log.info("Loading cities...");
         Set<City> cities = new HashSet<>();
-        IteratorUtils.toList(airports.iterator()).stream().forEach(airport -> {
+        IteratorUtils.toList(airports.iterator()).forEach(airport -> {
             City city = City.builder()
                     .name(airport.getCity())
                     .country(airport.getCountry())
 
-                    // TODO: There is no description of the city in the dataset. Set airport name as description.
+                    // There is no description of the city in the dataset. Set airport name as description.
                     .description(airport.getName())
                     .build();
             cities.add(city);
@@ -90,22 +89,27 @@ public class ImportDataService implements CommandLineRunner {
         log.info("Successfully loaded cities.");
     }
 
-    @Transactional
     public void loadAirports() {
         log.info("Loading airports...");
         File airportsFile = loadFile("classpath:airports.txt");
 
-        log.info(String.format("Parsing airports.txt."));
+        log.info("Parsing airports.txt.");
         double elapsedTimeInSecond;
         try {
             long start = System.nanoTime();
             CSVParser parser = CSVParser.parse(airportsFile, Charset.defaultCharset(), CSVFormat.ORACLE);
+
+            // Load all airports, filter out the ones without airport name, city or country
             List<Airport> collection = parser.getRecords().stream()
                     .parallel()
-                    .filter(record -> Objects.nonNull(record.get(2)))
+                    .filter(record -> StringUtils.isNotBlank(record.get(1)) && StringUtils.isNotBlank(record.get(2)) && StringUtils.isNotBlank(record.get(3)))
                     .map(airportMapper::fromCsvRecord)
                     .collect(Collectors.toList());
+
             Iterable<Airport> airports = airportRepository.saveAll(collection);
+
+            // Save them in three separate maps which will later be used when loading routes, since some routes don't
+            // have an airport id only iata/icao.
             airports.iterator().forEachRemaining(airport -> {
                 airportMapByExternalId.put(airport.getAirportExternalId(), airport);
                 if (airport.getIata() != null) {
@@ -125,7 +129,6 @@ public class ImportDataService implements CommandLineRunner {
         log.info(String.format("Successfully loaded airports in %s seconds.", elapsedTimeInSecond));
     }
 
-    @Transactional
     public void loadRoutes() {
         log.info("Loading routes...");
         File routesFile = loadFile("classpath:routes.txt");
@@ -175,7 +178,6 @@ public class ImportDataService implements CommandLineRunner {
         }
         return airport;
     }
-
 
     private File loadFile(String path) {
         try {
