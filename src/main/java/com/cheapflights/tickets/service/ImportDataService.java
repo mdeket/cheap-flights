@@ -1,12 +1,16 @@
 package com.cheapflights.tickets.service;
 
+import com.cheapflights.tickets.domain.dto.CityDTO;
+import com.cheapflights.tickets.domain.model.City;
 import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import com.cheapflights.tickets.domain.model.graph.Route;
+import com.cheapflights.tickets.repository.CityRepository;
 import com.cheapflights.tickets.repository.UserRepository;
 import com.cheapflights.tickets.repository.graph.AirportRepository;
 import com.cheapflights.tickets.repository.graph.RouteRepository;
 import lombok.extern.java.Log;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.springframework.boot.CommandLineRunner;
@@ -28,16 +32,18 @@ public class ImportDataService implements CommandLineRunner {
     private final AirportRepository airportRepository;
     private final RouteRepository routeRepository;
     private final UserRepository userRepository;
+    private final CityRepository cityRepository;
     private final AirportMapper airportMapper;
     private final RouteMapper routeMapper;
     private final Map<Long, Airport> airportMapByExternalId;
     private final Map<String, Airport> airportMapByIata;
     private final Map<String, Airport> airportMapByIcao;
 
-    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, UserRepository userRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
+    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, UserRepository userRepository, CityRepository cityRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
         this.airportRepository = airportRepository;
         this.routeRepository = routeRepository;
         this.userRepository = userRepository;
+        this.cityRepository = cityRepository;
         this.airportMapper = airportMapper;
         this.routeMapper = routeMapper;
         this.airportMapByExternalId = new HashMap<>();
@@ -48,10 +54,12 @@ public class ImportDataService implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Started importing data.");
-//        airportRepository.deleteAll();
-//        routeRepository.deleteAll();
-//        loadAirports();
-//        loadRoutes();
+        cityRepository.deleteAll();
+        airportRepository.deleteAll();
+        routeRepository.deleteAll();
+        loadAirports();
+        loadRoutes();
+        loadCities(airportRepository.findAll());
         loadUser();
         log.info("Finished importing data.");
     }
@@ -61,6 +69,25 @@ public class ImportDataService implements CommandLineRunner {
         user.setUsername("miland");
         user.setPassword("test");
         userRepository.save(user);
+    }
+
+
+    private void loadCities(Iterable<Airport> airports) {
+        log.info("Loading cities...");
+        Set<City> cities = new HashSet<>();
+        IteratorUtils.toList(airports.iterator()).stream().forEach(airport -> {
+            City city = City.builder()
+                    .name(airport.getCity())
+                    .country(airport.getCountry())
+
+                    // TODO: There is no description of the city in the dataset. Set airport name as description.
+                    .description(airport.getName())
+                    .build();
+            cities.add(city);
+        });
+
+        cityRepository.saveAll(cities);
+        log.info("Successfully loaded cities.");
     }
 
     @Transactional
