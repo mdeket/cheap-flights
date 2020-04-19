@@ -44,8 +44,9 @@ public class CommentService {
         Comment comment = Comment.builder()
                 .author(user.get())
                 .text(commentDTO.getText())
+                .createdAt(commentDTO.getCreatedAt())
+                .modifiedAt(commentDTO.getModifiedAt())
                 .city(city.get())
-                .timestamp(commentDTO.getTimestamp())
                 .build();
 
         if(commentDTO.getId() != null) {
@@ -59,7 +60,9 @@ public class CommentService {
         if(commentDTO.getId() == null) {
             throw new UpdateEntityException("Can't update comment with id missing.");
         }
-        findById(commentDTO.getId());
+        Comment comment = findById(commentDTO.getId());
+        commentDTO.setCreatedAt(comment.getCreatedAt());
+        commentDTO.setModifiedAt(comment.getModifiedAt());
         return save(commentDTO, userId);
     }
 

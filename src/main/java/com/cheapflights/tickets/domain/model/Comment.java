@@ -2,12 +2,14 @@ package com.cheapflights.tickets.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "comment")
 @Entity(name = "comment")
 public class Comment {
@@ -23,10 +25,18 @@ public class Comment {
     @JoinColumn(name="city", nullable=false)
     private City city;
     private String text;
-    private LocalDateTime timestamp;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
-    public Comment() {
+    @PrePersist
+    private void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.modifiedAt = this.createdAt;
+    }
 
+    @PreUpdate
+    private void preUpdate() {
+        this.modifiedAt = LocalDateTime.now();
     }
 
     public static CommentBuilder builder() {
@@ -38,7 +48,8 @@ public class Comment {
         private User author;
         private City city;
         private String text;
-        private LocalDateTime timestamp;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
 
         CommentBuilder() {
         }
@@ -63,17 +74,22 @@ public class Comment {
             return this;
         }
 
-        public CommentBuilder timestamp(LocalDateTime timestamp) {
-            this.timestamp = timestamp;
+        public CommentBuilder createdAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public CommentBuilder modifiedAt(LocalDateTime modifiedAt) {
+            this.modifiedAt = modifiedAt;
             return this;
         }
 
         public Comment build() {
-            return new Comment(id, author, city, text, timestamp);
+            return new Comment(id, author, city, text, createdAt, modifiedAt);
         }
 
         public String toString() {
-            return "Comment.CommentBuilder(id=" + this.id + ", author=" + this.author + ", city=" + this.city + ", text=" + this.text + ", timestamp=" + this.timestamp + ")";
+            return "Comment.CommentBuilder(id=" + this.id + ", author=" + this.author + ", city=" + this.city + ", text=" + this.text + ", createdAt=" + this.createdAt + ", modifiedAt=" + this.modifiedAt + ")";
         }
     }
 }

@@ -17,7 +17,8 @@ public class CommentMapper {
                 .text(comment.getText())
                 .author(comment.getAuthor().getId())
                 .city(comment.getCity().getId())
-                .timestamp(comment.getTimestamp())
+                .createdAt(comment.getCreatedAt())
+                .modifiedAt(comment.getModifiedAt())
                 .build();
     }
 

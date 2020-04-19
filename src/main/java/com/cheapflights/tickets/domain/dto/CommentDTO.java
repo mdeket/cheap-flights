@@ -12,5 +12,6 @@ public class CommentDTO {
     private Long author;
     private Long city;
     private String text;
-    private LocalDateTime timestamp;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 }
