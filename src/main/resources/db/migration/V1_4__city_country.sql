@@ -1,0 +1,1 @@
+ALTER TABLE city ADD COLUMN country varchar(50) NOT NULL;

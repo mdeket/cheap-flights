@@ -10,6 +10,7 @@ import java.util.List;
 public class CityDTO {
     private Long id;
     private String name;
+    private String country;
     private String description;
     private List<CommentDTO> comments;
 }
