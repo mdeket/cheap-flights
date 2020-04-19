@@ -1,6 +1,7 @@
 package com.cheapflights.tickets.controller;
 
 import com.cheapflights.tickets.domain.dto.ErrorDTO;
+import com.cheapflights.tickets.exception.UpdateEntityException;
 import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
-import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,5 +27,10 @@ public class ErrorHandlerController {
                 .map(constraintViolation -> new ErrorDTO(constraintViolation.getMessage()))
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(UpdateEntityException.class)
+    public ResponseEntity<ErrorDTO> updateEntityException(UpdateEntityException e) {
+        return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
     }
 }

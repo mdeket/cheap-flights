@@ -24,15 +24,32 @@ public class CommentController {
         this.commentMapper = commentMapper;
     }
 
-    @PostMapping
-    public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO){
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, 1l));
+    @GetMapping("/{id}")
+    public ResponseEntity<CommentDTO> getCommentById(@PathVariable Long id) {
+        Comment comment = commentService.findById(id);
+        return ResponseEntity.ok(commentMapper.toDTO(comment));
     }
 
     @GetMapping
     public ResponseEntity<Collection<CommentDTO>> getAllComments() {
         List<Comment> comments = new ArrayList<>(commentService.findAll());
         return ResponseEntity.ok(commentMapper.toDTO(comments));
+    }
+
+    @PostMapping
+    public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO){
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, 1l));
+    }
+
+    @PutMapping
+    public ResponseEntity<CommentDTO> updateComment(@RequestBody CommentDTO commentDTO) {
+        return ResponseEntity.ok(commentService.update(commentDTO, 1l));
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity deleteComment(@PathVariable Long commentId) {
+        commentService.deleteComment(commentId);
+        return ResponseEntity.noContent().build();
     }
 
 }
