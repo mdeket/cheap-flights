@@ -7,7 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Collection;
@@ -34,12 +33,6 @@ public class User implements UserDetails {
     @NotNull
     @Size(min = 1, max = 30)
     private String lastName;
-
-
-    @NotNull
-    @Size(min = 1, max = 50)
-    @Email
-    private String email;
 
     @NotNull
     @Size(min = 4, max = 128)

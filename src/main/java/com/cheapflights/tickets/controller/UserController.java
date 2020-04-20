@@ -12,17 +12,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class AuthenticationController {
+@RequestMapping("/api/v1/user")
+public class UserController {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final JwtUserDetailService userDetailsService;
 
-    public AuthenticationController(JwtTokenUtil jwtTokenUtil, JwtUserDetailService userDetailsService) {
+    public UserController(JwtTokenUtil jwtTokenUtil, JwtUserDetailService userDetailsService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
     }
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = "/auth", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());

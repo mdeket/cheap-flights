@@ -60,22 +60,22 @@ public class ImportDataService implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Started importing data.");
-        userRepository.deleteAll();
-        cityRepository.deleteAll();
-        airportRepository.deleteAll();
-        routeRepository.deleteAll();
-        loadAirports();
-        loadRoutes();
-        loadCities(airportRepository.findAll());
-
-        User author = loadUser();
-        City city = IteratorUtils.toList(cityRepository.findAll().iterator()).stream().findFirst().get();
-        Comment comment = Comment.builder()
-                .city(city)
-                .author(author)
-                .text("Lorem ipsum")
-                .build();
-        commentRepository.save(comment);
+//        userRepository.deleteAll();
+//        cityRepository.deleteAll();
+//        airportRepository.deleteAll();
+//        routeRepository.deleteAll();
+//        loadAirports();
+//        loadRoutes();
+//        loadCities(airportRepository.findAll());
+//
+//        User author = loadUser();
+//        City city = IteratorUtils.toList(cityRepository.findAll().iterator()).stream().findFirst().get();
+//        Comment comment = Comment.builder()
+//                .city(city)
+//                .author(author)
+//                .text("Lorem ipsum")
+//                .build();
+//        commentRepository.save(comment);
 
 
         log.info("Finished importing data.");
@@ -84,7 +84,6 @@ public class ImportDataService implements CommandLineRunner {
     private User loadUser() {
         User user = new User();
         user.setUsername("miland");
-        user.setEmail("milandeket@gmail.com");
         user.setPassword("test");
         user.setFirstName("Milan");
         user.setLastName("Deket");
