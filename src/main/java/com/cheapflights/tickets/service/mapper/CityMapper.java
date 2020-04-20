@@ -4,6 +4,8 @@ import com.cheapflights.tickets.domain.dto.CityDTO;
 import com.cheapflights.tickets.domain.model.City;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.Tuple;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,16 @@ public class CityMapper {
             cityDTO.setComments(commentMapper.toDTO(city.getComments()));
         }
         return cityDTO;
+    }
+
+    public CityDTO toDTO(Tuple tuple) {
+        return CityDTO.builder()
+                .id(tuple.get("id", Number.class).longValue())
+                .country(tuple.get("country", String.class))
+                .name(tuple.get("name", String.class))
+                .comments(new ArrayList<>())
+                .description(tuple.get("description", String.class))
+                .build();
     }
 
     public Collection<CityDTO> toDTO(Collection<City> cities) {
