@@ -2,12 +2,15 @@ package com.cheapflights.tickets.service;
 
 import com.cheapflights.tickets.domain.dto.CityDTO;
 import com.cheapflights.tickets.domain.dto.CommentDTO;
+import com.cheapflights.tickets.domain.model.City;
 import com.cheapflights.tickets.repository.CityRepository;
 import com.cheapflights.tickets.service.mapper.CityMapper;
 import com.cheapflights.tickets.service.mapper.CommentMapper;
+import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -40,5 +43,10 @@ public class CityService {
                     }
                 });
         return cityWithComments.values();
+    }
+
+    public Collection<CityDTO> findAll() {
+        List<City> cities = IteratorUtils.toList(cityRepository.findAll().iterator());
+        return cityMapper.toDTO(cities);
     }
 }

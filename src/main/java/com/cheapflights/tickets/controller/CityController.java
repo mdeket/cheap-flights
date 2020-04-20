@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Collection;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/cities")
@@ -27,8 +28,9 @@ public class CityController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<CityDTO>> getAllCities(@RequestParam(required = false) Integer comments) {
-        return ResponseEntity.ok().body(cityService.findAll(comments));
+    public ResponseEntity<Collection<CityDTO>> getAllCities(@RequestParam(required = false) Optional<Integer> comments) {
+        Collection<CityDTO> cities = comments.map(cityService::findAll).orElse(cityService.findAll());
+        return ResponseEntity.ok().body(cities);
     }
 
     @GetMapping("/{id}")
