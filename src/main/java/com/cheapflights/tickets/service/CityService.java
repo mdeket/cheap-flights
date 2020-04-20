@@ -34,7 +34,9 @@ public class CityService {
                     CommentDTO commentDTO = commentMapper.toDTO(tuple);
 
                     if (!cityWithComments.containsKey(cityDTO.getId())) {
-                        cityDTO.getComments().add(commentDTO);
+                        if(commentDTO.getId() != null) {
+                            cityDTO.getComments().add(commentDTO);
+                        }
                         cityWithComments.put(cityDTO.getId(), cityDTO);
                     } else {
                         CityDTO existingCity = cityWithComments.get(cityDTO.getId());
