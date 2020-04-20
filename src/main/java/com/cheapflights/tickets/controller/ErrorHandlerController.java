@@ -1,6 +1,7 @@
 package com.cheapflights.tickets.controller;
 
 import com.cheapflights.tickets.domain.dto.ErrorDTO;
+import com.cheapflights.tickets.exception.AirportsNotImportedException;
 import com.cheapflights.tickets.exception.UpdateEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,11 @@ public class ErrorHandlerController {
 
     @ExceptionHandler(UpdateEntityException.class)
     public ResponseEntity<ErrorDTO> updateEntityException(UpdateEntityException e) {
+        return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
+    }
+
+    @ExceptionHandler(AirportsNotImportedException.class)
+    public ResponseEntity<ErrorDTO> airportsNotImportedException(AirportsNotImportedException e) {
         return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
     }
 }

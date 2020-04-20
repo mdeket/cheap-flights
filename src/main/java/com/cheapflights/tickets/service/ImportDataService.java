@@ -5,6 +5,7 @@ import com.cheapflights.tickets.domain.model.City;
 import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import com.cheapflights.tickets.domain.model.graph.Route;
+import com.cheapflights.tickets.exception.AirportsNotImportedException;
 import com.cheapflights.tickets.repository.CityRepository;
 import com.cheapflights.tickets.repository.CommentRepository;
 import com.cheapflights.tickets.repository.UserRepository;
@@ -18,11 +19,10 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -62,9 +62,9 @@ public class ImportDataService implements CommandLineRunner {
     public void run(String... args) {
         log.info("Started importing data.");
         userRepository.deleteAll();
-//        cityRepository.deleteAll();
-//        airportRepository.deleteAll();
-//        routeRepository.deleteAll();
+        cityRepository.deleteAll();
+        airportRepository.deleteAll();
+        routeRepository.deleteAll();
 //        loadAirports();
 //        loadRoutes();
 //        loadCities(airportRepository.findAll());
@@ -108,15 +108,12 @@ public class ImportDataService implements CommandLineRunner {
         log.info("Successfully loaded cities.");
     }
 
-    public void loadAirports() {
-        log.info("Loading airports...");
-        File airportsFile = loadFile("classpath:airports.txt");
-
-        log.info("Parsing airports.txt.");
+    public void loadAirports(MultipartFile file) {
+        log.info(String.format("Parsing %s", file.getName()));
         double elapsedTimeInSecond;
         try {
             long start = System.nanoTime();
-            CSVParser parser = CSVParser.parse(airportsFile, Charset.defaultCharset(), CSVFormat.ORACLE);
+            CSVParser parser = CSVParser.parse(file.getInputStream(), Charset.defaultCharset(), CSVFormat.ORACLE);
 
             // Load all airports, filter out the ones without airport name, city or country
             List<Airport> collection = parser.getRecords().stream()
@@ -139,6 +136,7 @@ public class ImportDataService implements CommandLineRunner {
                     airportMapByIcao.put(airport.getIcao(), airport);
                 }
             });
+            loadCities(airports);
             long end = System.nanoTime();
             elapsedTimeInSecond = (double) (end - start) / 1_000_000_000;
         } catch (IOException e) {
@@ -148,14 +146,16 @@ public class ImportDataService implements CommandLineRunner {
         log.info(String.format("Successfully loaded airports in %s seconds.", elapsedTimeInSecond));
     }
 
-    public void loadRoutes() {
-        log.info("Loading routes...");
-        File routesFile = loadFile("classpath:routes.txt");
+    public void loadRoutes(MultipartFile file) {
+        if(airportRepository.count() == 0) {
+            throw new AirportsNotImportedException("Please upload airports before routes.");
+        }
+        log.info(String.format("Parsing %s", file.getName()));
         List<Route> routes = new ArrayList<>();
 
         long start = System.nanoTime();
         try {
-            CSVParser parser = CSVParser.parse(routesFile, Charset.defaultCharset(), CSVFormat.ORACLE);
+            CSVParser parser = CSVParser.parse(file.getInputStream(), Charset.defaultCharset(), CSVFormat.ORACLE);
             routes = parser.getRecords().parallelStream()
                     .parallel()
                     .map(routeMapper::fromCsvRecord)
@@ -196,14 +196,6 @@ public class ImportDataService implements CommandLineRunner {
             }
         }
         return airport;
-    }
-
-    private File loadFile(String path) {
-        try {
-            return ResourceUtils.getFile(path);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(String.format("%s can't be found.", path), e);
-        }
     }
 
 }
