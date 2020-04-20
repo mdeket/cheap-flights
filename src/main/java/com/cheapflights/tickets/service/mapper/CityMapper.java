@@ -1,4 +1,4 @@
-package com.cheapflights.tickets.service;
+package com.cheapflights.tickets.service.mapper;
 
 import com.cheapflights.tickets.domain.dto.CityDTO;
 import com.cheapflights.tickets.domain.model.City;
@@ -31,7 +31,7 @@ public class CityMapper {
                 .country(city.getCountry())
                 .description(city.getDescription())
                 .build();
-        if(city.getComments() != null) {
+        if (city.getComments() != null) {
             cityDTO.setComments(commentMapper.toDTO(city.getComments()));
         }
         return cityDTO;

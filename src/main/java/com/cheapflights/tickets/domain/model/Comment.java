@@ -19,16 +19,20 @@ public class Comment {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="author", nullable=false)
+    @JoinColumn(name = "author", nullable = false)
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="city", nullable=false)
+    @JoinColumn(name = "city", nullable = false)
     private City city;
 
     private String text;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+
+    public static CommentBuilder builder() {
+        return new CommentBuilder();
+    }
 
     @PrePersist
     private void prePersist() {
@@ -39,10 +43,6 @@ public class Comment {
     @PreUpdate
     private void preUpdate() {
         this.modifiedAt = LocalDateTime.now();
-    }
-
-    public static CommentBuilder builder() {
-        return new CommentBuilder();
     }
 
     public static class CommentBuilder {

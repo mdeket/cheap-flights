@@ -6,9 +6,12 @@ import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import com.cheapflights.tickets.domain.model.graph.Route;
 import com.cheapflights.tickets.repository.CityRepository;
+import com.cheapflights.tickets.repository.CommentRepository;
 import com.cheapflights.tickets.repository.UserRepository;
 import com.cheapflights.tickets.repository.graph.AirportRepository;
 import com.cheapflights.tickets.repository.graph.RouteRepository;
+import com.cheapflights.tickets.service.mapper.AirportMapper;
+import com.cheapflights.tickets.service.mapper.RouteMapper;
 import lombok.extern.java.Log;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
@@ -33,17 +36,19 @@ public class ImportDataService implements CommandLineRunner {
     private final RouteRepository routeRepository;
     private final UserRepository userRepository;
     private final CityRepository cityRepository;
+    private final CommentRepository commentRepository;
     private final AirportMapper airportMapper;
     private final RouteMapper routeMapper;
     private final Map<Long, Airport> airportMapByExternalId;
     private final Map<String, Airport> airportMapByIata;
     private final Map<String, Airport> airportMapByIcao;
 
-    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, UserRepository userRepository, CityRepository cityRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
+    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, UserRepository userRepository, CityRepository cityRepository, CommentRepository commentRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
         this.airportRepository = airportRepository;
         this.routeRepository = routeRepository;
         this.userRepository = userRepository;
         this.cityRepository = cityRepository;
+        this.commentRepository = commentRepository;
         this.airportMapper = airportMapper;
         this.routeMapper = routeMapper;
         this.airportMapByExternalId = new HashMap<>();
@@ -54,18 +59,35 @@ public class ImportDataService implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Started importing data.");
-        userRepository.deleteAll();
-        cityRepository.deleteAll();
-        airportRepository.deleteAll();
-        routeRepository.deleteAll();
-        loadAirports();
+//        userRepository.deleteAll();
+//        cityRepository.deleteAll();
+//        airportRepository.deleteAll();
+//        routeRepository.deleteAll();
+//        loadAirports();
 //        loadRoutes();
-        loadCities(airportRepository.findAll());
-        loadUser();
+//        loadCities(airportRepository.findAll());
+//
+//        User author = loadUser();
+//        City city = IteratorUtils.toList(cityRepository.findAll().iterator()).stream().findFirst().get();
+//        Comment comment = Comment.builder()
+//        .city(city)
+//        .author(author)
+//        .text("123123 sdfasfsd das qwd asc")
+//        .build();
+//        commentRepository.save(comment);
+//        commentRepository.save(comment);
+//        commentRepository.save(comment);
+//        commentRepository.save(comment);
+//        commentRepository.save(comment);
+//        commentRepository.save(comment);
+//        commentRepository.save(comment);
+//        commentRepository.save(comment);
+
+
         log.info("Finished importing data.");
     }
 
-    private void loadUser() {
+    private User loadUser() {
         User user = new User();
         user.setUsername("miland");
         user.setEmail("milandeket@gmail.com");
@@ -74,7 +96,7 @@ public class ImportDataService implements CommandLineRunner {
         user.setLastName("Deket");
         user.setSalt("1233213123");
         user.setRole(AuthorityConstants.ROLE_ADMIN);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
 

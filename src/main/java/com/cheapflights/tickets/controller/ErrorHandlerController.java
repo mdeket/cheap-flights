@@ -2,7 +2,6 @@ package com.cheapflights.tickets.controller;
 
 import com.cheapflights.tickets.domain.dto.ErrorDTO;
 import com.cheapflights.tickets.exception.UpdateEntityException;
-import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

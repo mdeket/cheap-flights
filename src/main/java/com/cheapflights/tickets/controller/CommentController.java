@@ -2,7 +2,7 @@ package com.cheapflights.tickets.controller;
 
 import com.cheapflights.tickets.domain.dto.CommentDTO;
 import com.cheapflights.tickets.domain.model.Comment;
-import com.cheapflights.tickets.service.CommentMapper;
+import com.cheapflights.tickets.service.mapper.CommentMapper;
 import com.cheapflights.tickets.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +36,9 @@ public class CommentController {
         return ResponseEntity.ok(commentMapper.toDTO(comments));
     }
 
-    @PostMapping
-    public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO){
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, 4l));
+    @PostMapping("/{userId}")
+    public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO, @PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, userId));
     }
 
     @PutMapping

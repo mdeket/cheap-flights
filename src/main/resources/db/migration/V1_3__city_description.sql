@@ -1,1 +1,1 @@
-ALTER TABLE city MODIFY description TEXT NOT NULL;
+ALTER TABLE city MODIFY description varchar(1000) NOT NULL;

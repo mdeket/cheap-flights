@@ -1,4 +1,4 @@
-package com.cheapflights.tickets.service;
+package com.cheapflights.tickets.service.mapper;
 
 import org.apache.commons.csv.CSVRecord;
 

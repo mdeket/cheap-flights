@@ -8,6 +8,7 @@ import com.cheapflights.tickets.exception.UpdateEntityException;
 import com.cheapflights.tickets.repository.CityRepository;
 import com.cheapflights.tickets.repository.CommentRepository;
 import com.cheapflights.tickets.repository.UserRepository;
+import com.cheapflights.tickets.service.mapper.CommentMapper;
 import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,7 @@ public class CommentService {
                 .city(city.get())
                 .build();
 
-        if(commentDTO.getId() != null) {
+        if (commentDTO.getId() != null) {
             comment.setId(commentDTO.getId());
         }
 
@@ -57,7 +58,7 @@ public class CommentService {
     }
 
     public CommentDTO update(CommentDTO commentDTO, Long userId) {
-        if(commentDTO.getId() == null) {
+        if (commentDTO.getId() == null) {
             throw new UpdateEntityException("Can't update comment with id missing.");
         }
         Comment comment = findById(commentDTO.getId());

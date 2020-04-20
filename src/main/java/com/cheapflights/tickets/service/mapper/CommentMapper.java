@@ -1,8 +1,7 @@
-package com.cheapflights.tickets.service;
+package com.cheapflights.tickets.service.mapper;
 
 import com.cheapflights.tickets.domain.dto.CommentDTO;
 import com.cheapflights.tickets.domain.model.Comment;
-import com.cheapflights.tickets.repository.CommentRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
