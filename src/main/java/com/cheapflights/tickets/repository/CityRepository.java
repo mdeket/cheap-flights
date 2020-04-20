@@ -3,6 +3,7 @@ package com.cheapflights.tickets.repository;
 import com.cheapflights.tickets.domain.model.City;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Tuple;
@@ -15,8 +16,9 @@ public interface CityRepository extends CrudRepository<City, Long> {
             "com.id as commentId, com.text as text, com.created_at as createdAt, com.modified_at as modifiedAt " +
             "FROM city AS c " +
             "LEFT JOIN comment AS com ON com.id IN " +
-            "(SELECT com1.id FROM comment AS com1 WHERE c.id=com1.city LIMIT ?1);"
+            "(SELECT com1.id FROM comment AS com1 WHERE c.id=com1.city LIMIT :numberOfComments)" +
+            "WHERE c.name ilike CONCAT('%',:nameLike,'%');"
             , nativeQuery = true)
-    List<Tuple> findAllWithComments(int numberOfComments);
+    List<Tuple> findAllWithComments(@Param("numberOfComments") int numberOfComments, @Param("nameLike") String nameLike);
 
 }

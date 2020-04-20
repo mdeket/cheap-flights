@@ -3,8 +3,8 @@ package com.cheapflights.tickets.controller;
 import com.cheapflights.tickets.domain.dto.CityDTO;
 import com.cheapflights.tickets.domain.model.City;
 import com.cheapflights.tickets.repository.CityRepository;
-import com.cheapflights.tickets.service.mapper.CityMapper;
 import com.cheapflights.tickets.service.CityService;
+import com.cheapflights.tickets.service.mapper.CityMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +28,10 @@ public class CityController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<CityDTO>> getAllCities(@RequestParam(required = false) Optional<Integer> comments) {
-        Collection<CityDTO> cities = comments.map(cityService::findAll).orElse(cityService.findAll());
+    public ResponseEntity<Collection<CityDTO>> getAllCities(@RequestParam(required = false) Optional<Integer> comments,
+                                                            @RequestParam(required = false, defaultValue = "") String name) {
+        Collection<CityDTO> cities = comments.map(numberOfComments -> cityService.findAll(numberOfComments, name))
+                .orElse(cityService.findAll());
         return ResponseEntity.ok().body(cities);
     }
 

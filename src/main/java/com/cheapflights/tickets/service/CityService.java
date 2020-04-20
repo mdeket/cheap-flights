@@ -8,6 +8,7 @@ import com.cheapflights.tickets.service.mapper.CityMapper;
 import com.cheapflights.tickets.service.mapper.CommentMapper;
 import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.stereotype.Service;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -26,15 +27,15 @@ public class CityService {
         this.commentMapper = commentMapper;
     }
 
-    public Collection<CityDTO> findAll(Integer numberOfComments) {
+    public Collection<CityDTO> findAll(Integer numberOfComments, String nameLike) {
         Map<Long, CityDTO> cityWithComments = new HashMap<>();
-        cityRepository.findAllWithComments(numberOfComments)
+        cityRepository.findAllWithComments(numberOfComments, nameLike)
                 .forEach(tuple -> {
                     CityDTO cityDTO = cityMapper.toDTO(tuple);
                     CommentDTO commentDTO = commentMapper.toDTO(tuple);
 
                     if (!cityWithComments.containsKey(cityDTO.getId())) {
-                        if(commentDTO.getId() != null) {
+                        if (commentDTO.getId() != null) {
                             cityDTO.getComments().add(commentDTO);
                         }
                         cityWithComments.put(cityDTO.getId(), cityDTO);

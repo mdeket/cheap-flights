@@ -2,6 +2,7 @@ package com.cheapflights.tickets.service;
 
 import com.cheapflights.tickets.config.security.AuthorityConstants;
 import com.cheapflights.tickets.domain.model.City;
+import com.cheapflights.tickets.domain.model.Comment;
 import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import com.cheapflights.tickets.domain.model.graph.Route;
@@ -59,29 +60,22 @@ public class ImportDataService implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Started importing data.");
-//        userRepository.deleteAll();
-//        cityRepository.deleteAll();
-//        airportRepository.deleteAll();
-//        routeRepository.deleteAll();
-//        loadAirports();
-//        loadRoutes();
-//        loadCities(airportRepository.findAll());
-//
-//        User author = loadUser();
-//        City city = IteratorUtils.toList(cityRepository.findAll().iterator()).stream().findFirst().get();
-//        Comment comment = Comment.builder()
-//        .city(city)
-//        .author(author)
-//        .text("123123 sdfasfsd das qwd asc")
-//        .build();
-//        commentRepository.save(comment);
-//        commentRepository.save(comment);
-//        commentRepository.save(comment);
-//        commentRepository.save(comment);
-//        commentRepository.save(comment);
-//        commentRepository.save(comment);
-//        commentRepository.save(comment);
-//        commentRepository.save(comment);
+        userRepository.deleteAll();
+        cityRepository.deleteAll();
+        airportRepository.deleteAll();
+        routeRepository.deleteAll();
+        loadAirports();
+        loadRoutes();
+        loadCities(airportRepository.findAll());
+
+        User author = loadUser();
+        City city = IteratorUtils.toList(cityRepository.findAll().iterator()).stream().findFirst().get();
+        Comment comment = Comment.builder()
+                .city(city)
+                .author(author)
+                .text("Lorem ipsum")
+                .build();
+        commentRepository.save(comment);
 
 
         log.info("Finished importing data.");
