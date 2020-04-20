@@ -7,6 +7,7 @@ import com.cheapflights.tickets.service.CityService;
 import com.cheapflights.tickets.service.mapper.CityMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -42,6 +43,7 @@ public class CityController {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<CityDTO> addCity(@RequestBody CityDTO cityDTO) {
         final City city = cityMapper.toEntity(cityDTO);
