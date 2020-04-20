@@ -1,8 +1,7 @@
 package com.cheapflights.tickets.service;
 
-import com.cheapflights.tickets.config.security.AuthorityConstants;
+import com.cheapflights.tickets.domain.dto.UserDTO;
 import com.cheapflights.tickets.domain.model.City;
-import com.cheapflights.tickets.domain.model.Comment;
 import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import com.cheapflights.tickets.domain.model.graph.Route;
@@ -36,6 +35,7 @@ public class ImportDataService implements CommandLineRunner {
     private final AirportRepository airportRepository;
     private final RouteRepository routeRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final CityRepository cityRepository;
     private final CommentRepository commentRepository;
     private final AirportMapper airportMapper;
@@ -44,10 +44,11 @@ public class ImportDataService implements CommandLineRunner {
     private final Map<String, Airport> airportMapByIata;
     private final Map<String, Airport> airportMapByIcao;
 
-    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, UserRepository userRepository, CityRepository cityRepository, CommentRepository commentRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
+    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, UserRepository userRepository, UserService userService, CityRepository cityRepository, CommentRepository commentRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
         this.airportRepository = airportRepository;
         this.routeRepository = routeRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
         this.cityRepository = cityRepository;
         this.commentRepository = commentRepository;
         this.airportMapper = airportMapper;
@@ -60,7 +61,7 @@ public class ImportDataService implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Started importing data.");
-//        userRepository.deleteAll();
+        userRepository.deleteAll();
 //        cityRepository.deleteAll();
 //        airportRepository.deleteAll();
 //        routeRepository.deleteAll();
@@ -68,7 +69,7 @@ public class ImportDataService implements CommandLineRunner {
 //        loadRoutes();
 //        loadCities(airportRepository.findAll());
 //
-//        User author = loadUser();
+        User author = loadUser();
 //        City city = IteratorUtils.toList(cityRepository.findAll().iterator()).stream().findFirst().get();
 //        Comment comment = Comment.builder()
 //                .city(city)
@@ -82,14 +83,10 @@ public class ImportDataService implements CommandLineRunner {
     }
 
     private User loadUser() {
-        User user = new User();
-        user.setUsername("miland");
-        user.setPassword("test");
-        user.setFirstName("Milan");
-        user.setLastName("Deket");
-        user.setSalt("1233213123");
-        user.setRole(AuthorityConstants.ROLE_ADMIN);
-        return userRepository.save(user);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername("miland");
+        userDTO.setPassword("test");
+        return userService.createUser(userDTO);
     }
 
 
