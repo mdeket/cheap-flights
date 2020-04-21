@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class ErrorDTO {
+public class ResponseMessageDTO {
     private final LocalDateTime timestamp = LocalDateTime.now();
     private String message;
 
-    public ErrorDTO(String message) {
+    public ResponseMessageDTO(String message) {
         this.message = message;
     }
 }

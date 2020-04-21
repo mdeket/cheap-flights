@@ -1,14 +1,10 @@
 package com.cheapflights.tickets.service;
 
-import com.cheapflights.tickets.domain.dto.UserDTO;
 import com.cheapflights.tickets.domain.model.City;
-import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import com.cheapflights.tickets.domain.model.graph.Route;
 import com.cheapflights.tickets.exception.AirportsNotImportedException;
 import com.cheapflights.tickets.repository.CityRepository;
-import com.cheapflights.tickets.repository.CommentRepository;
-import com.cheapflights.tickets.repository.UserRepository;
 import com.cheapflights.tickets.repository.graph.AirportRepository;
 import com.cheapflights.tickets.repository.graph.RouteRepository;
 import com.cheapflights.tickets.service.mapper.AirportMapper;
@@ -17,78 +13,48 @@ import lombok.extern.java.Log;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Service
 @Log
-public class ImportDataService implements CommandLineRunner {
+public class ImportDataService {
 
     private final AirportRepository airportRepository;
     private final RouteRepository routeRepository;
-    private final UserRepository userRepository;
-    private final UserService userService;
     private final CityRepository cityRepository;
-    private final CommentRepository commentRepository;
     private final AirportMapper airportMapper;
     private final RouteMapper routeMapper;
     private final Map<Long, Airport> airportMapByExternalId;
     private final Map<String, Airport> airportMapByIata;
     private final Map<String, Airport> airportMapByIcao;
+    private final String DATA_FOLDER = "uploads";
 
-    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, UserRepository userRepository, UserService userService, CityRepository cityRepository, CommentRepository commentRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
+    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, CityRepository cityRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
         this.airportRepository = airportRepository;
         this.routeRepository = routeRepository;
-        this.userRepository = userRepository;
-        this.userService = userService;
         this.cityRepository = cityRepository;
-        this.commentRepository = commentRepository;
         this.airportMapper = airportMapper;
         this.routeMapper = routeMapper;
         this.airportMapByExternalId = new HashMap<>();
         this.airportMapByIata = new HashMap<>();
         this.airportMapByIcao = new HashMap<>();
     }
-
-    @Override
-    public void run(String... args) {
-        log.info("Started importing data.");
-        userRepository.deleteAll();
-        cityRepository.deleteAll();
-        airportRepository.deleteAll();
-        routeRepository.deleteAll();
-//        loadAirports();
-//        loadRoutes();
-//        loadCities(airportRepository.findAll());
-//
-        User author = loadUser();
-//        City city = IteratorUtils.toList(cityRepository.findAll().iterator()).stream().findFirst().get();
-//        Comment comment = Comment.builder()
-//                .city(city)
-//                .author(author)
-//                .text("Lorem ipsum")
-//                .build();
-//        commentRepository.save(comment);
-
-
-        log.info("Finished importing data.");
-    }
-
-    private User loadUser() {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername("miland");
-        userDTO.setPassword("test");
-        return userService.createUser(userDTO);
-    }
-
 
     private void loadCities(Iterable<Airport> airports) {
         log.info("Loading cities...");
@@ -108,12 +74,41 @@ public class ImportDataService implements CommandLineRunner {
         log.info("Successfully loaded cities.");
     }
 
-    public void loadAirports(MultipartFile file) {
+    /**
+     * Saves file to uploads folder in project root.
+     *
+     * @param file
+     * @return Saved file.
+     */
+    public File saveFile(MultipartFile file) {
+        log.info("Saving file to UPLOADS folder.");
+        Path path = Paths.get(DATA_FOLDER);
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectory(path);
+            } catch (IOException e) {
+                log.log(Level.SEVERE, String.format("Failed when trying to create %s folder", DATA_FOLDER), e);
+                e.printStackTrace();
+            }
+        }
+
+        try (InputStream inputStream = file.getInputStream()) {
+            File newFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+            FileUtils.copyInputStreamToFile(inputStream, newFile);
+            return newFile;
+        } catch (IOException e) {
+            log.log(Level.SEVERE, String.format("Saving file to %s folder.", DATA_FOLDER), e);
+        }
+        throw new RuntimeException("Input file was not successfully saved.");
+    }
+
+    @Async
+    public CompletableFuture<Boolean> loadAirports(File file) {
         log.info(String.format("Parsing %s", file.getName()));
         double elapsedTimeInSecond;
         try {
             long start = System.nanoTime();
-            CSVParser parser = CSVParser.parse(file.getInputStream(), Charset.defaultCharset(), CSVFormat.ORACLE);
+            CSVParser parser = CSVParser.parse(file, Charset.defaultCharset(), CSVFormat.ORACLE);
 
             // Load all airports, filter out the ones without airport name, city or country
             List<Airport> collection = parser.getRecords().stream()
@@ -144,26 +139,29 @@ public class ImportDataService implements CommandLineRunner {
         }
 
         log.info(String.format("Successfully loaded airports in %s seconds.", elapsedTimeInSecond));
+        return CompletableFuture.completedFuture(Boolean.TRUE);
     }
 
-    public void loadRoutes(MultipartFile file) {
-        if(airportRepository.count() == 0) {
+    @Async
+    public void loadRoutes(File file) {
+        System.out.println(airportRepository.count());
+        if (airportRepository.count() == 0) {
             throw new AirportsNotImportedException("Please upload airports before routes.");
         }
         log.info(String.format("Parsing %s", file.getName()));
-        List<Route> routes = new ArrayList<>();
 
+        List<Route> routes;
         long start = System.nanoTime();
         try {
-            CSVParser parser = CSVParser.parse(file.getInputStream(), Charset.defaultCharset(), CSVFormat.ORACLE);
-            routes = parser.getRecords().parallelStream()
+            CSVParser parser = CSVParser.parse(file, Charset.defaultCharset(), CSVFormat.ORACLE);
+            routes = parser.getRecords().stream()
                     .parallel()
                     .map(routeMapper::fromCsvRecord)
                     .peek(this::assignAirportsToRoute)
                     .filter(route -> route.getDestination() != null && route.getSource() != null)
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Couldn't instantiate csv parser.", e);
         }
 
         log.info(String.format("Saving %d routes to database.", routes.size()));

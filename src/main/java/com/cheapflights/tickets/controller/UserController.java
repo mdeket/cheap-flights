@@ -1,6 +1,8 @@
 package com.cheapflights.tickets.controller;
 
-import com.cheapflights.tickets.config.security.*;
+import com.cheapflights.tickets.config.security.JwtRequest;
+import com.cheapflights.tickets.config.security.JwtResponse;
+import com.cheapflights.tickets.config.security.TokenProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

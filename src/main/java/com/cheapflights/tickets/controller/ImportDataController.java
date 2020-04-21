@@ -1,5 +1,6 @@
 package com.cheapflights.tickets.controller;
 
+import com.cheapflights.tickets.domain.dto.ResponseMessageDTO;
 import com.cheapflights.tickets.service.ImportDataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 @RestController
 @RequestMapping("/api/v1/import")
@@ -21,15 +24,17 @@ public class ImportDataController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/airports")
-    public ResponseEntity uploadAirports(@RequestParam("file") MultipartFile file) {
-        importDataService.loadAirports(file);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ResponseMessageDTO> uploadAirports(@RequestParam(name = "file") MultipartFile file) {
+        File savedFile = importDataService.saveFile(file);
+        importDataService.loadAirports(savedFile);
+        return ResponseEntity.ok(new ResponseMessageDTO("Parsing of " + file.getOriginalFilename() + " has started and it will take a couple of seconds up to a one minute [Async]."));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/routes")
-    public ResponseEntity uploadRoutes(@RequestParam("file") MultipartFile file) {
-        importDataService.loadRoutes(file);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ResponseMessageDTO> uploadRoutes(@RequestParam("file") MultipartFile file) {
+        File savedFile = importDataService.saveFile(file);
+        importDataService.loadRoutes(savedFile);
+        return ResponseEntity.ok(new ResponseMessageDTO("Parsing of " + file.getOriginalFilename() + " has started and it will take a couple of seconds up to a one minute [Async]."));
     }
 }

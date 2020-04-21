@@ -28,7 +28,7 @@ public class RouteMapper {
     }
 
     private BigDecimal loadPriceFromCsvRecord(CSVRecord csvRecord) {
-        if(csvRecord.get(9) != null) {
+        if (csvRecord.get(9) != null) {
             return new BigDecimal(csvRecord.get(9));
         } else {
             log.warning(String.format("Price missing for route with source/destination [%s/%s], setting max price.", csvRecord.get(2), csvRecord.get(4)));
