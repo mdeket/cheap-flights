@@ -1,7 +1,6 @@
 package com.cheapflights.tickets.domain.dto;
 
 import com.cheapflights.tickets.config.security.AuthorityConstants;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 

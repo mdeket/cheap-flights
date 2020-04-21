@@ -3,8 +3,11 @@ package com.cheapflights.tickets.controller;
 import com.cheapflights.tickets.domain.dto.ResponseMessageDTO;
 import com.cheapflights.tickets.exception.AirportsNotImportedException;
 import com.cheapflights.tickets.exception.UpdateEntityException;
+import com.cheapflights.tickets.exception.UsernameTakenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -37,5 +40,20 @@ public class ErrorHandlerController {
     @ExceptionHandler(AirportsNotImportedException.class)
     public ResponseEntity<ResponseMessageDTO> airportsNotImportedException(AirportsNotImportedException e) {
         return ResponseEntity.badRequest().body(new ResponseMessageDTO(e.getMessage()));
+    }
+
+    @ExceptionHandler(UsernameTakenException.class)
+    public ResponseEntity<ResponseMessageDTO> usernameTakenException(UsernameTakenException e) {
+        return ResponseEntity.badRequest().body(new ResponseMessageDTO(e.getMessage()));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ResponseMessageDTO> badCredentialsException(BadCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessageDTO(e.getMessage()));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ResponseMessageDTO> authenticationException(AuthenticationException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessageDTO(e.getMessage()));
     }
 }

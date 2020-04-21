@@ -1,5 +1,6 @@
 package com.cheapflights.tickets.controller;
 
+import com.cheapflights.tickets.config.security.CustomAuthenticationProvider;
 import com.cheapflights.tickets.config.security.JwtRequest;
 import com.cheapflights.tickets.config.security.JwtResponse;
 import com.cheapflights.tickets.config.security.TokenProvider;
@@ -10,25 +11,26 @@ import com.cheapflights.tickets.service.mapper.UserMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
 
     private final TokenProvider tokenProvider;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final CustomAuthenticationProvider authenticationProvider;
     private final UserService userService;
     private final UserMapper userMapper;
 
-    public UserController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserService userService, UserMapper userMapper) {
+    public UserController(TokenProvider tokenProvider, CustomAuthenticationProvider authenticationProvider, UserService userService, UserMapper userMapper) {
         this.tokenProvider = tokenProvider;
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.authenticationProvider = authenticationProvider;
         this.userService = userService;
         this.userMapper = userMapper;
     }
@@ -38,7 +40,7 @@ public class UserController {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authentication = authenticationProvider.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.createToken(authentication);
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -48,7 +50,7 @@ public class UserController {
         return new ResponseEntity<>(new JwtResponse(jwt), httpHeaders, HttpStatus.OK);
     }
 
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
         User user = userService.save(userDTO);
