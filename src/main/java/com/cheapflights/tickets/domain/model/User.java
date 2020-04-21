@@ -2,6 +2,7 @@ package com.cheapflights.tickets.domain.model;
 
 import com.cheapflights.tickets.config.security.AuthorityConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,8 +17,8 @@ import java.util.List;
 
 @Data
 @Entity
+@Builder
 @Table(name = "user")
-// TODO: Add missing fields
 public class User implements UserDetails {
 
     @Id
@@ -54,14 +55,6 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Comment> comments;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @Override
     public boolean isAccountNonExpired() {
         return false;
@@ -85,14 +78,6 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Arrays.asList(new SimpleGrantedAuthority(role.toString()));
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
 }
