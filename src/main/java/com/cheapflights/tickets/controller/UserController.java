@@ -8,7 +8,6 @@ import com.cheapflights.tickets.domain.dto.UserDTO;
 import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.service.UserService;
 import com.cheapflights.tickets.service.mapper.UserMapper;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,11 +42,7 @@ public class UserController {
         Authentication authentication = authenticationProvider.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.createToken(authentication);
-        HttpHeaders httpHeaders = new HttpHeaders();
-
-        // TODO: To constants
-        httpHeaders.add("Authorization", "Bearer " + jwt);
-        return new ResponseEntity<>(new JwtResponse(jwt), httpHeaders, HttpStatus.OK);
+        return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
     //    @PreAuthorize("hasRole('ROLE_ADMIN')")
