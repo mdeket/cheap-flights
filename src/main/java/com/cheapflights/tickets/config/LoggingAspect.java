@@ -32,16 +32,10 @@ public class LoggingAspect {
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         log.info(String.format("Enter: %s.%s() with argument[s] = %s", joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName(), Arrays.toString(joinPoint.getArgs())));
-        try {
-            Object result = joinPoint.proceed();
-            log.info(String.format("Exit: %s.%s() with result = %s", joinPoint.getSignature().getDeclaringTypeName(),
-                    joinPoint.getSignature().getName(), result));
-            return result;
-        } catch (IllegalArgumentException e) {
-            log.warning(String.format("Illegal argument: %s in %s.%s()", Arrays.toString(joinPoint.getArgs()),
-                    joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName()));
-            throw e;
-        }
+        Object result = joinPoint.proceed();
+        log.info(String.format("Exit: %s.%s() with result = %s", joinPoint.getSignature().getDeclaringTypeName(),
+                joinPoint.getSignature().getName(), result));
+        return result;
     }
 }
 
