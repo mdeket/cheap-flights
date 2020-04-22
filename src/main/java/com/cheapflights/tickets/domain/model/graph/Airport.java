@@ -1,6 +1,6 @@
 package com.cheapflights.tickets.domain.model.graph;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import org.neo4j.ogm.annotation.GeneratedValue;
@@ -30,12 +30,10 @@ public class Airport {
     private BigDecimal longitude;
     private Integer altitude;
     private Float timezoneUtc;
-
-    // TODO: Convert to ENUM
     private String dst;
     private String timezoneOlson;
 
-    @JsonIgnoreProperties("airports")
+    @JsonIgnore
     @Relationship(type = "ROUTE_TO")
     private List<Airport> airports;
 
