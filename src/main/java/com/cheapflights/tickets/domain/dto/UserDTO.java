@@ -31,4 +31,8 @@ public class UserDTO {
 
     @NotNull
     private AuthorityConstants role;
+
+    public String toString() {
+        return "UserDTO(id=" + this.getId() + ", username=" + this.getUsername() + ", firstName=" + this.getFirstName() + ", lastName=" + this.getLastName() + ", role=" + this.getRole() + ")";
+    }
 }
