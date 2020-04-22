@@ -93,7 +93,7 @@ public class ImportDataService {
         }
 
         try (InputStream inputStream = file.getInputStream()) {
-            File newFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+            File newFile = new File(DATA_FOLDER + "/" + file.getOriginalFilename());
             FileUtils.copyInputStreamToFile(inputStream, newFile);
             return newFile;
         } catch (IOException e) {
@@ -102,8 +102,28 @@ public class ImportDataService {
         throw new RuntimeException("Input file was not successfully saved.");
     }
 
+    /**
+     * Deletes a file from uploads folder.
+     */
+    public void deleteFile(String fileName) {
+        log.info(String.format("Deleting file %s from UPLOADS folder.", fileName));
+        Path path = Paths.get(String.format("%s/%s", DATA_FOLDER, fileName));
+        if (Files.exists(path)) {
+            try {
+                Files.deleteIfExists(path);
+                log.info(String.format("File %s is successfully deleted.", fileName));
+            } catch (IOException e) {
+                log.severe(String.format("An error occurred when tried to delete a file %s", fileName));
+                e.printStackTrace();
+            }
+        } else {
+            log.info("Does not exist!" + path.toString());
+        }
+    }
+
+
     @Async
-    public CompletableFuture<Boolean> loadAirports(File file) {
+    public CompletableFuture<Void> loadAirportsAndCities(File file) {
         log.info(String.format("Parsing %s", file.getName()));
         double elapsedTimeInSecond;
         try {
@@ -139,15 +159,16 @@ public class ImportDataService {
         }
 
         log.info(String.format("Successfully loaded airports in %s seconds.", elapsedTimeInSecond));
-        return CompletableFuture.completedFuture(Boolean.TRUE);
+        deleteFile(file.getName());
+        return CompletableFuture.completedFuture(null);
     }
 
     @Async
-    public void loadRoutes(File file) {
-        System.out.println(airportRepository.count());
+    public CompletableFuture<Void> loadRoutes(File file) {
         if (airportRepository.count() == 0) {
             throw new AirportsNotImportedException("Please upload airports before routes.");
         }
+
         log.info(String.format("Parsing %s", file.getName()));
 
         List<Route> routes;
@@ -170,6 +191,8 @@ public class ImportDataService {
         long end = System.nanoTime();
         double elapsedTimeInSecond = (double) (end - start) / 1_000_000_000;
         log.info(String.format("Done loading routes in %s seconds.", elapsedTimeInSecond));
+        deleteFile(file.getName());
+        return CompletableFuture.completedFuture(null);
     }
 
     private void assignAirportsToRoute(Route route) {

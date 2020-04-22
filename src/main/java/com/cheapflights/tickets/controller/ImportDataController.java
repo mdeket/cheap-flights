@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/v1/import")
@@ -26,7 +27,7 @@ public class ImportDataController {
     @PostMapping("/airports")
     public ResponseEntity<ResponseMessageDTO> uploadAirports(@RequestParam(name = "file") MultipartFile file) {
         File savedFile = importDataService.saveFile(file);
-        importDataService.loadAirports(savedFile);
+        importDataService.loadAirportsAndCities(savedFile);
         return ResponseEntity.ok(new ResponseMessageDTO("Parsing of " + file.getOriginalFilename() + " has started and it will take a couple of seconds up to a one minute [Async]."));
     }
 
