@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,14 +22,11 @@ import java.util.stream.Collectors;
 @Component
 public class TokenProvider {
 
-    // TODO: load this from config
-    public static final long JWT_TOKEN_VALIDITY = 3600000; // 1h
-    private static final String AUTHORITIES_KEY = "auth";
-    @Value("${jwt.secret}")
-    private String secret;
+    private final JwtConfig jwtConfig;
 
-    // TODO: use this for secret
-//    private Key key;
+    public TokenProvider(JwtConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+    }
 
     public String createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
@@ -38,24 +34,24 @@ public class TokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-        Date validity = new Date(now + JWT_TOKEN_VALIDITY);
+        Date validity = new Date(now + jwtConfig.getTokenValidity());
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .claim(jwtConfig.getAuthoritiesKey(), authorities)
+                .signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret())
                 .setExpiration(validity)
                 .compact();
     }
 
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(secret)
+                .setSigningKey(jwtConfig.getSecret())
                 .parseClaimsJws(token)
                 .getBody();
 
         Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+                Arrays.stream(claims.get(jwtConfig.getAuthoritiesKey()).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
@@ -66,7 +62,7 @@ public class TokenProvider {
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(jwtConfig.getSecret()).parseClaimsJws(authToken);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             log.info("Invalid JWT token.");
