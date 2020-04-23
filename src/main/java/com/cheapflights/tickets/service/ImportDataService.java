@@ -13,25 +13,18 @@ import lombok.extern.java.Log;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,19 +37,19 @@ public class ImportDataService {
     private final RouteGraphService routeGraphService;
     private final RouteGraphMapper routeGraphMapper;
     private final CityService cityService;
+    private final FileService fileService;
     private final Map<Long, Airport> airportMapByExternalId;
     private final Map<String, Airport> airportMapByIata;
     private final Map<String, Airport> airportMapByIcao;
 
-    private final String DATA_FOLDER = "uploads";
-
-    public ImportDataService(AirportGraphRepository airportGraphRepository, AirportRepository airportRepository, AirportGraphMapper airportGraphMapper, RouteGraphService routeGraphService, RouteGraphMapper routeGraphMapper, CityService cityService) {
+    public ImportDataService(AirportGraphRepository airportGraphRepository, AirportRepository airportRepository, AirportGraphMapper airportGraphMapper, RouteGraphService routeGraphService, RouteGraphMapper routeGraphMapper, CityService cityService, FileService fileService) {
         this.airportGraphRepository = airportGraphRepository;
         this.airportRepository = airportRepository;
         this.airportGraphMapper = airportGraphMapper;
         this.routeGraphService = routeGraphService;
         this.routeGraphMapper = routeGraphMapper;
         this.cityService = cityService;
+        this.fileService = fileService;
         this.airportMapByExternalId = new HashMap<>();
         this.airportMapByIata = new HashMap<>();
         this.airportMapByIcao = new HashMap<>();
@@ -106,53 +99,6 @@ public class ImportDataService {
     }
 
     /**
-     * Saves file to uploads folder in project root.
-     *
-     * @param file
-     * @return Saved file.
-     */
-    public File saveFile(MultipartFile file) {
-        log.info("Saving file to UPLOADS folder.");
-        Path path = Paths.get(DATA_FOLDER);
-        if (!Files.exists(path)) {
-            try {
-                Files.createDirectory(path);
-            } catch (IOException e) {
-                log.log(Level.SEVERE, String.format("Failed when trying to create %s folder", DATA_FOLDER), e);
-                e.printStackTrace();
-            }
-        }
-
-        try (InputStream inputStream = file.getInputStream()) {
-            File newFile = new File(DATA_FOLDER + "/" + file.getOriginalFilename());
-            FileUtils.copyInputStreamToFile(inputStream, newFile);
-            return newFile;
-        } catch (IOException e) {
-            log.log(Level.SEVERE, String.format("Saving file to %s folder.", DATA_FOLDER), e);
-        }
-        throw new RuntimeException("Input file was not successfully saved.");
-    }
-
-    /**
-     * Deletes a file from uploads folder.
-     */
-    public void deleteFile(String fileName) {
-        log.info(String.format("Deleting file %s from UPLOADS folder.", fileName));
-        Path path = Paths.get(String.format("%s/%s", DATA_FOLDER, fileName));
-        if (Files.exists(path)) {
-            try {
-                Files.deleteIfExists(path);
-                log.info(String.format("File %s is successfully deleted.", fileName));
-            } catch (IOException e) {
-                log.severe(String.format("An error occurred when tried to delete a file %s", fileName));
-                e.printStackTrace();
-            }
-        } else {
-            log.info("Does not exist!" + path.toString());
-        }
-    }
-
-    /**
      * Read file, creates Airport object first for graph database, then call loadCitiesAndAirports
      * which will then go through all airports that are saved in graph db, and create entities of Airports and City
      * for relational database.
@@ -195,7 +141,7 @@ public class ImportDataService {
         }
 
         log.info(String.format("Successfully loaded airports in %s seconds.", elapsedTimeInSecond));
-        deleteFile(file.getName());
+        fileService.deleteFile(file.getName());
         return CompletableFuture.completedFuture(null);
     }
 
@@ -227,7 +173,7 @@ public class ImportDataService {
         long end = System.nanoTime();
         double elapsedTimeInSecond = (double) (end - start) / 1_000_000_000;
         log.info(String.format("Done loading routes in %s seconds.", elapsedTimeInSecond));
-        deleteFile(file.getName());
+        fileService.deleteFile(file.getName());
         return CompletableFuture.completedFuture(null);
     }
 
