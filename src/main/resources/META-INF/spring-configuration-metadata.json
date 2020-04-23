@@ -4,6 +4,31 @@
       "name": "jwt.secret",
       "type": "java.lang.String",
       "description": "String used as a secret when generating JWT."
+    },
+    {
+      "name": "jwt.tokenValidity",
+      "type": "java.lang.Long",
+      "description": "Number of milliseconds for how long token will be valid."
+    },
+    {
+      "name": "jwt.authoritiesKey",
+      "type": "java.lang.String",
+      "description": "String that will be used as a key when getting token from header.."
+    },
+    {
+      "name": "neo4j.uri",
+      "type": "java.lang.String",
+      "description": "URI for connecting to Neo4j."
+    },
+    {
+      "name": "neo4j.username",
+      "type": "java.lang.String",
+      "description": "Username which will be used when connecting to Neo4j."
+    },
+    {
+      "name": "neo4j.password",
+      "type": "java.lang.String",
+      "description": "Password which will be used when connecting to Neo4j."
     }
   ]
 }
