@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Data
@@ -27,7 +29,10 @@ public class Comment {
     @JoinColumn(name = "city", nullable = false)
     private City city;
 
+    @NotNull(message = "text must not be null.")
+    @Size(min = 1, max = 1000, message = "text must be between 1 and 1000 chars.")
     private String text;
+
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 

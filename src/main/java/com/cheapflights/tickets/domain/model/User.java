@@ -25,29 +25,30 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Size(min = 4, max = 50)
+    @NotNull(message = "username must not be null.")
+    @Size(min = 4, max = 50, message = "username length must be between 4 and 50 characters.")
     private String username;
 
-    @NotNull
-    @Size(min = 1, max = 30)
+    @NotNull(message = "firstName must not be null.")
+    @Size(min = 1, max = 30, message = "firstName length must be between 1 and 30 characters.")
     private String firstName;
 
-    @NotNull
-    @Size(min = 1, max = 30)
+    @NotNull(message = "lastName must not be null.")
+    @Size(min = 1, max = 30, message = "lastName length must be between 1 and 30 characters.")
     private String lastName;
 
-    @NotNull
-    @Size(min = 4, max = 200)
+    @NotNull(message = "password must not be null.")
+    @Size(min = 4, max = 200, message = "lastName length must be longer than 4 character.")
     @JsonIgnore
     private String password;
 
+    // TODO: delete this
     @NotNull
     @Size(min = 1, max = 100)
     @JsonIgnore
     private String salt;
 
-    @NotNull
+    @NotNull(message = "role must not be null.")
     @Enumerated(EnumType.STRING)
     private AuthorityConstants role;
 

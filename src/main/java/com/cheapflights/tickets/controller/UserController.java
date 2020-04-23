@@ -45,6 +45,7 @@ public class UserController {
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
+    // TODO:
     //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {

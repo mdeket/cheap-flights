@@ -8,6 +8,7 @@ import com.cheapflights.tickets.service.mapper.UserMapper;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -32,5 +33,9 @@ public class UserService {
         user.setSalt(salt);
         user.setPassword(hashedPassword);
         return userRepository.save(user);
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 }

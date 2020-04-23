@@ -5,9 +5,7 @@ import com.cheapflights.tickets.domain.model.City;
 import com.cheapflights.tickets.domain.model.Comment;
 import com.cheapflights.tickets.domain.model.User;
 import com.cheapflights.tickets.exception.UpdateEntityException;
-import com.cheapflights.tickets.repository.CityRepository;
 import com.cheapflights.tickets.repository.CommentRepository;
-import com.cheapflights.tickets.repository.UserRepository;
 import com.cheapflights.tickets.service.mapper.CommentMapper;
 import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.stereotype.Service;
@@ -21,33 +19,27 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
-    private final UserRepository userRepository;
-    private final CityRepository cityRepository;
+    private final UserService userService;
+    private final CityService cityService;
 
-    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper, UserRepository userRepository, CityRepository cityRepository) {
+    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper, UserService userService, CityService cityService) {
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
-        this.userRepository = userRepository;
-        this.cityRepository = cityRepository;
+        this.userService = userService;
+        this.cityService = cityService;
     }
 
     public CommentDTO save(CommentDTO commentDTO, Long userId) {
-        Optional<City> city = cityRepository.findById(commentDTO.getCity());
-        if (city.isEmpty()) {
-            throw new EntityNotFoundException(String.format("City with id [%d] couldn't be found.", commentDTO.getCity()));
-        }
+        City city = cityService.findOne(commentDTO.getCity());
 
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new EntityNotFoundException(String.format("User with id [%d] couldn't be found.", userId));
-        }
+        User user = userService.findById(userId);
 
         Comment comment = Comment.builder()
-                .author(user.get())
+                .author(user)
                 .text(commentDTO.getText())
                 .createdAt(commentDTO.getCreatedAt())
                 .modifiedAt(commentDTO.getModifiedAt())
-                .city(city.get())
+                .city(city)
                 .build();
 
         if (commentDTO.getId() != null) {
