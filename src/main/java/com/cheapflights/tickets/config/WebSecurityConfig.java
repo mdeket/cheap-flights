@@ -1,5 +1,6 @@
 package com.cheapflights.tickets.config;
 
+import com.cheapflights.tickets.config.security.JwtAuthenticationEntryPoint;
 import com.cheapflights.tickets.config.security.JwtConfigurer;
 import com.cheapflights.tickets.config.security.TokenProvider;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +18,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    //    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final TokenProvider tokenProvider;
 
-    //    public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, TokenProvider tokenProvider) {
-    public WebSecurityConfig(TokenProvider tokenProvider) {
-//        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, TokenProvider tokenProvider) {
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.tokenProvider = tokenProvider;
     }
 
@@ -36,13 +36,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
-//                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-//                .and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/user/**").permitAll()
-                .antMatchers("/api/**").permitAll()
+                .antMatchers("/api/**").authenticated()
                 .and()
                 .httpBasic()
                 .and()

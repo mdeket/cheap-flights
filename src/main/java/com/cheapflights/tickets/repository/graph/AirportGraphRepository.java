@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public interface AirportRepository extends Neo4jRepository<Airport, Long> {
+public interface AirportGraphRepository extends Neo4jRepository<Airport, Long> {
+
     @Query(value = "MATCH (from:Airport{airportExternalId: $fromId}), (end:Airport{airportExternalId: $toId}) CALL apoc.algo.dijkstra(from, end, 'ROUTE>', 'price') YIELD path, weight as totalPrice RETURN nodes(path) AS airports, totalPrice")
     List<Map<String, Object>> findCheapestFlight(@Param("fromId") Long fromExternalAirportId, @Param("toId") Long toExternalAirportId);
 
-    @Query(value = "MATCH (from:Airport{airportExternalId: $fromId}), (end:Airport{airportExternalId: $toId}) CALL apoc.algo.dijkstra(from, end, 'ROUTE>', 'price') YIELD path, weight as totalPrice RETURN path")
-    List<Map<String, Object>> findCheapestFlightRoutes(@Param("fromId") Long fromExternalAirportId, @Param("toId") Long toExternalAirportId);
+    List<Airport> findByCity(String cityName);
 }
 

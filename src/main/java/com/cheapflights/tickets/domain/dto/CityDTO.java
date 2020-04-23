@@ -13,4 +13,5 @@ public class CityDTO {
     private String country;
     private String description;
     private List<CommentDTO> comments;
+    private List<AirportDTO> airports;
 }

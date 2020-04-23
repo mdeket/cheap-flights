@@ -31,9 +31,7 @@ public class CityController {
     @GetMapping
     public ResponseEntity<Collection<CityDTO>> getAllCities(@RequestParam(required = false) Optional<Integer> comments,
                                                             @RequestParam(required = false, defaultValue = "") String name) {
-        Collection<CityDTO> cities = comments.map(numberOfComments -> cityService.findAll(numberOfComments, name))
-                .orElse(cityService.findAll());
-        return ResponseEntity.ok().body(cities);
+        return ResponseEntity.ok().body(cityService.findAll(comments, name));
     }
 
     @GetMapping("/{id}")

@@ -4,6 +4,7 @@ import com.cheapflights.tickets.domain.dto.ResponseMessageDTO;
 import com.cheapflights.tickets.exception.AirportsNotImportedException;
 import com.cheapflights.tickets.exception.UpdateEntityException;
 import com.cheapflights.tickets.exception.UsernameTakenException;
+import io.jsonwebtoken.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -54,6 +55,11 @@ public class ErrorHandlerController {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ResponseMessageDTO> authenticationException(AuthenticationException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessageDTO(e.getMessage()));
+    }
+
+    @ExceptionHandler({ExpiredJwtException.class, ClaimJwtException.class, UnsupportedJwtException.class, MalformedJwtException.class, SignatureException.class})
+    public ResponseEntity<ResponseMessageDTO> jwtException(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessageDTO(e.getMessage()));
     }
 }

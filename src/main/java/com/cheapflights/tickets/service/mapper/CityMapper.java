@@ -1,5 +1,6 @@
 package com.cheapflights.tickets.service.mapper;
 
+import com.cheapflights.tickets.domain.dto.AirportDTO;
 import com.cheapflights.tickets.domain.dto.CityDTO;
 import com.cheapflights.tickets.domain.model.City;
 import org.springframework.stereotype.Component;
@@ -7,14 +8,17 @@ import org.springframework.stereotype.Component;
 import javax.persistence.Tuple;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class CityMapper {
     private final CommentMapper commentMapper;
+    private final AirportMapper airportMapper;
 
-    public CityMapper(CommentMapper commentMapper) {
+    public CityMapper(CommentMapper commentMapper, AirportMapper airportMapper) {
         this.commentMapper = commentMapper;
+        this.airportMapper = airportMapper;
     }
 
     public City toEntity(CityDTO cityDTO) {
@@ -36,6 +40,8 @@ public class CityMapper {
         if (city.getComments() != null) {
             cityDTO.setComments(commentMapper.toDTO(city.getComments()));
         }
+        List<AirportDTO> airportDTOList = airportMapper.toDTO(city.getAirports());
+        cityDTO.setAirports(airportDTOList);
         return cityDTO;
     }
 
@@ -45,6 +51,7 @@ public class CityMapper {
                 .country(tuple.get("country", String.class))
                 .name(tuple.get("name", String.class))
                 .comments(new ArrayList<>())
+                .airports(new ArrayList<>())
                 .description(tuple.get("description", String.class))
                 .build();
     }

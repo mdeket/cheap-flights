@@ -4,9 +4,11 @@ import com.cheapflights.tickets.domain.model.City;
 import com.cheapflights.tickets.domain.model.graph.Airport;
 import com.cheapflights.tickets.domain.model.graph.Route;
 import com.cheapflights.tickets.exception.AirportsNotImportedException;
+import com.cheapflights.tickets.repository.AirportRepository;
 import com.cheapflights.tickets.repository.CityRepository;
-import com.cheapflights.tickets.repository.graph.AirportRepository;
+import com.cheapflights.tickets.repository.graph.AirportGraphRepository;
 import com.cheapflights.tickets.repository.graph.RouteRepository;
+import com.cheapflights.tickets.service.mapper.AirportGraphMapper;
 import com.cheapflights.tickets.service.mapper.AirportMapper;
 import com.cheapflights.tickets.service.mapper.RouteMapper;
 import lombok.extern.java.Log;
@@ -26,7 +28,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -35,9 +40,11 @@ import java.util.stream.Collectors;
 @Log
 public class ImportDataService {
 
+    private final AirportGraphRepository airportGraphRepository;
     private final AirportRepository airportRepository;
     private final RouteRepository routeRepository;
     private final CityRepository cityRepository;
+    private final AirportGraphMapper airportGraphMapper;
     private final AirportMapper airportMapper;
     private final RouteMapper routeMapper;
     private final Map<Long, Airport> airportMapByExternalId;
@@ -45,10 +52,12 @@ public class ImportDataService {
     private final Map<String, Airport> airportMapByIcao;
     private final String DATA_FOLDER = "uploads";
 
-    public ImportDataService(AirportRepository airportRepository, RouteRepository routeRepository, CityRepository cityRepository, AirportMapper airportMapper, RouteMapper routeMapper) {
+    public ImportDataService(AirportGraphRepository airportGraphRepository, AirportRepository airportRepository, RouteRepository routeRepository, CityRepository cityRepository, AirportGraphMapper airportGraphMapper, AirportMapper airportMapper, RouteMapper routeMapper) {
+        this.airportGraphRepository = airportGraphRepository;
         this.airportRepository = airportRepository;
         this.routeRepository = routeRepository;
         this.cityRepository = cityRepository;
+        this.airportGraphMapper = airportGraphMapper;
         this.airportMapper = airportMapper;
         this.routeMapper = routeMapper;
         this.airportMapByExternalId = new HashMap<>();
@@ -56,21 +65,48 @@ public class ImportDataService {
         this.airportMapByIcao = new HashMap<>();
     }
 
-    private void loadCities(Iterable<Airport> airports) {
+    private void loadCitiesAndAirports(Iterable<Airport> graphAirports) {
         log.info("Loading cities...");
-        Set<City> cities = new HashSet<>();
-        IteratorUtils.toList(airports.iterator()).forEach(airport -> {
-            City city = City.builder()
-                    .name(airport.getCity())
-                    .country(airport.getCountry())
+        Map<String, List<com.cheapflights.tickets.domain.model.Airport>> citiesWithAirports = new HashMap<>();
+        List<City> cities = new ArrayList<>();
+        IteratorUtils.toList(graphAirports.iterator()).forEach(graphAirport -> {
 
+
+            City city = City.builder()
+                    .name(graphAirport.getCity())
+                    .country(graphAirport.getCountry())
+                    .airports(new ArrayList<>())
                     // There is no description of the city in the dataset. Set airport name as description.
-                    .description(airport.getName())
+                    .description(graphAirport.getName())
                     .build();
-            cities.add(city);
+
+            com.cheapflights.tickets.domain.model.Airport airport =
+                    com.cheapflights.tickets.domain.model.Airport.builder()
+                        .externalId(graphAirport.getAirportExternalId())
+                        .name(graphAirport.getName())
+                        .build();
+
+
+            if (citiesWithAirports.containsKey(city.getName())) {
+                List<com.cheapflights.tickets.domain.model.Airport> airportList = citiesWithAirports.get(city.getName());
+                airportList.add(airport);
+            } else {
+                cities.add(city);
+                List<com.cheapflights.tickets.domain.model.Airport> airportList = new ArrayList<>();
+                airportList.add(airport);
+                citiesWithAirports.put(city.getName(), airportList);
+            }
         });
 
-        cityRepository.saveAll(cities);
+        Iterable<City> savedCities = cityRepository.saveAll(cities);
+
+        savedCities.iterator().forEachRemaining(city -> {
+
+            List<com.cheapflights.tickets.domain.model.Airport> airports = citiesWithAirports.get(city.getName());
+            airports.stream().forEach(airport -> airport.setCity(city));
+            airportRepository.saveAll(airports);
+
+        });
         log.info("Successfully loaded cities.");
     }
 
@@ -121,7 +157,11 @@ public class ImportDataService {
         }
     }
 
-
+    /**
+     * Read file, creates Airport object first for graph database, then call loadCitiesAndAirports
+     * which will then go through all airports that are saved in graph db, and create entities of Airports and City
+     * for relational database.
+     */
     @Async
     public CompletableFuture<Void> loadAirportsAndCities(File file) {
         log.info(String.format("Parsing %s", file.getName()));
@@ -134,14 +174,14 @@ public class ImportDataService {
             List<Airport> collection = parser.getRecords().stream()
                     .parallel()
                     .filter(record -> StringUtils.isNotBlank(record.get(1)) && StringUtils.isNotBlank(record.get(2)) && StringUtils.isNotBlank(record.get(3)))
-                    .map(airportMapper::fromCsvRecord)
+                    .map(airportGraphMapper::fromCsvRecord)
                     .collect(Collectors.toList());
 
-            Iterable<Airport> airports = airportRepository.saveAll(collection);
+            Iterable<Airport> airportsGraph = airportGraphRepository.saveAll(collection);
 
             // Save them in three separate maps which will later be used when loading routes, since some routes don't
             // have an airport id only iata/icao.
-            airports.iterator().forEachRemaining(airport -> {
+            airportsGraph.iterator().forEachRemaining(airport -> {
                 airportMapByExternalId.put(airport.getAirportExternalId(), airport);
                 if (airport.getIata() != null) {
                     airportMapByIata.put(airport.getIata(), airport);
@@ -150,8 +190,9 @@ public class ImportDataService {
                 if (airport.getIcao() != null) {
                     airportMapByIcao.put(airport.getIcao(), airport);
                 }
+
             });
-            loadCities(airports);
+            loadCitiesAndAirports(airportsGraph);
             long end = System.nanoTime();
             elapsedTimeInSecond = (double) (end - start) / 1_000_000_000;
         } catch (IOException e) {
@@ -165,7 +206,7 @@ public class ImportDataService {
 
     @Async
     public CompletableFuture<Void> loadRoutes(File file) {
-        if (airportRepository.count() == 0) {
+        if (airportGraphRepository.count() == 0) {
             throw new AirportsNotImportedException("Please upload airports before routes.");
         }
 

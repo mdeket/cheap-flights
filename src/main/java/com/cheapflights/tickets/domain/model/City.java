@@ -33,7 +33,14 @@ public class City {
     @Size(min = 1, max = 2000, message = "Description must be between 0 and 2000 chars.")
     private String description;
 
+    // TODO: to lazy?
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "city", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Comment> comments;
+
+
+    // TODO: to lazy?
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "city", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private List<Airport> airports;
 }

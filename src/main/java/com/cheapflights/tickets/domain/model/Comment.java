@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity(name = "comment")
 public class Comment {
 
+    // TODO add constraints
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
