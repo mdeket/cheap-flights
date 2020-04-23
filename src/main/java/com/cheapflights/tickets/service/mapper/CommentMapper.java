@@ -28,9 +28,13 @@ public class CommentMapper {
         Timestamp createdAt = tuple.get("createdAt", Timestamp.class);
         Timestamp modifiedAt = tuple.get("modifiedAt", Timestamp.class);
         Number commentId = tuple.get("commentId", Number.class);
+        Number authorId = tuple.get("author", Number.class);
+        Number cityId = tuple.get("id", Number.class);
 
         return CommentDTO.builder()
                 .id(commentId != null ? commentId.longValue() : null)
+                .author(authorId != null ? authorId.longValue() : null)
+                .city(cityId != null ? cityId.longValue() : null)
                 .text(tuple.get("text", String.class))
                 .createdAt(createdAt != null ? createdAt.toLocalDateTime() : null)
                 .modifiedAt(modifiedAt != null ? modifiedAt.toLocalDateTime() : null)

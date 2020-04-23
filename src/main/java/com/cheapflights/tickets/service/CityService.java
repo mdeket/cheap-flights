@@ -36,7 +36,6 @@ public class CityService {
                 .orElseGet(() -> cityRepository.findAllWithComments(nameLike));
 
         Map<Long, CityDTO> cityWithComments = new HashMap<>();
-//        cityRepository.findAllWithComments(numberOfComments, nameLike)
         data
                 .forEach(tuple -> {
                     CityDTO cityDTO = cityMapper.toDTO(tuple);
