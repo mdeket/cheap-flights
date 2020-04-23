@@ -6,9 +6,9 @@ import com.cheapflights.tickets.domain.model.graph.Route;
 import com.cheapflights.tickets.exception.AirportsNotImportedException;
 import com.cheapflights.tickets.repository.AirportRepository;
 import com.cheapflights.tickets.repository.graph.AirportGraphRepository;
-import com.cheapflights.tickets.repository.graph.RouteRepository;
-import com.cheapflights.tickets.service.mapper.AirportGraphMapper;
-import com.cheapflights.tickets.service.mapper.RouteMapper;
+import com.cheapflights.tickets.service.graph.RouteGraphService;
+import com.cheapflights.tickets.service.mapper.graph.AirportGraphMapper;
+import com.cheapflights.tickets.service.mapper.graph.RouteGraphMapper;
 import lombok.extern.java.Log;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
@@ -40,21 +40,22 @@ public class ImportDataService {
 
     private final AirportGraphRepository airportGraphRepository;
     private final AirportRepository airportRepository;
-    private final RouteRepository routeRepository;
     private final AirportGraphMapper airportGraphMapper;
-    private final RouteMapper routeMapper;
+    private final RouteGraphService routeGraphService;
+    private final RouteGraphMapper routeGraphMapper;
     private final CityService cityService;
     private final Map<Long, Airport> airportMapByExternalId;
     private final Map<String, Airport> airportMapByIata;
     private final Map<String, Airport> airportMapByIcao;
+
     private final String DATA_FOLDER = "uploads";
 
-    public ImportDataService(AirportGraphRepository airportGraphRepository, AirportRepository airportRepository, RouteRepository routeRepository, AirportGraphMapper airportGraphMapper, RouteMapper routeMapper, CityService cityService) {
+    public ImportDataService(AirportGraphRepository airportGraphRepository, AirportRepository airportRepository, AirportGraphMapper airportGraphMapper, RouteGraphService routeGraphService, RouteGraphMapper routeGraphMapper, CityService cityService) {
         this.airportGraphRepository = airportGraphRepository;
         this.airportRepository = airportRepository;
-        this.routeRepository = routeRepository;
         this.airportGraphMapper = airportGraphMapper;
-        this.routeMapper = routeMapper;
+        this.routeGraphService = routeGraphService;
+        this.routeGraphMapper = routeGraphMapper;
         this.cityService = cityService;
         this.airportMapByExternalId = new HashMap<>();
         this.airportMapByIata = new HashMap<>();
@@ -212,7 +213,7 @@ public class ImportDataService {
             CSVParser parser = CSVParser.parse(file, Charset.defaultCharset(), CSVFormat.ORACLE);
             routes = parser.getRecords().stream()
                     .parallel()
-                    .map(routeMapper::fromCsvRecord)
+                    .map(routeGraphMapper::fromCsvRecord)
                     .peek(this::assignAirportsToRoute)
                     .filter(route -> route.getDestination() != null && route.getSource() != null)
                     .collect(Collectors.toList());
@@ -221,7 +222,7 @@ public class ImportDataService {
         }
 
         log.info(String.format("Saving %d routes to database.", routes.size()));
-        routeRepository.saveAll(routes);
+        routeGraphService.saveAll(routes);
 
         long end = System.nanoTime();
         double elapsedTimeInSecond = (double) (end - start) / 1_000_000_000;

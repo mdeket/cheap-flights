@@ -1,4 +1,4 @@
-package com.cheapflights.tickets.service.mapper;
+package com.cheapflights.tickets.service.mapper.graph;
 
 import com.cheapflights.tickets.domain.model.graph.Route;
 import lombok.extern.java.Log;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 @Component
 @Log
-public class RouteMapper {
+public class RouteGraphMapper {
 
     public Route fromCsvRecord(CSVRecord csvRecord) {
         return Route.builder()
