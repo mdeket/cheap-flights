@@ -1,10 +1,8 @@
 package com.cheapflights.tickets.domain.dto;
 
 import com.cheapflights.tickets.config.security.AuthorityConstants;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -27,8 +25,7 @@ public class UserDTO {
     private String lastName;
 
     @NotNull(message = "password must not be null.")
-    @Size(min = 4, max = 128, message = "lastName length must be longer than 4 character.")
-    @JsonIgnore
+    @Size(min = 4, max = 128, message = "password length must be longer than 4 character.")
     private String password;
 
     @NotNull(message = "role must not be null.")

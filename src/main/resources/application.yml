@@ -1,11 +1,27 @@
 server:
     port: 8080
 spring:
+    datasource:
+        driver-class-name: org.h2.Driver
+        password: ''
+        url: jdbc:h2:file:~/flight-advisor;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;
+        username: sa
     flyway:
         baseline-on-migrate: true
+    h2:
+        console:
+            enabled: true
+            path: /h2
+            settings:
+                web-allow-others: true
     jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
         generate-ddl: false
         hibernate:
             ddl-auto: none
         open-in-view: false
         show-sql: false
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 10MB
