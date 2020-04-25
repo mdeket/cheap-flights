@@ -10,12 +10,19 @@ pipeline {
                 sh "docker tag flight-advisor:latest 864313221502.dkr.ecr.eu-central-1.amazonaws.com/flight-advisor:latest"
             }
         }
+
+        stage("Login To AWS ECR - flight-advisor") {
+            steps {
+                script {
+                    sh "aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 864313221502.dkr.ecr.eu-central-1.amazonaws.com/flight-advisor"
+                }
+            }
+        }
+
         stage("Push Docker Image To AWS ECR - flight-advisor") {
             steps {
                 script {
-                    docker.withRegistry("https://${AWS_ECR_REPO_URL}", "ecr:eu-central-1:${env.profile}-aws-ecr") {
-                        sh "docker push 864313221502.dkr.ecr.eu-central-1.amazonaws.com/flight-advisor:latest"
-                    }
+                    sh "docker push 864313221502.dkr.ecr.eu-central-1.amazonaws.com/flight-advisor:latest"
                 }
             }
         }
