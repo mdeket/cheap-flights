@@ -1,23 +1,23 @@
 version: '3.3'
 services:
   flight-advisor:
-    # image: flight-advisor app
     build:
       context: .
       dockerfile: docker/backend.dockerfile
-      args:
-        PROFILE: ${PROFILE}
-        NEO4J_PASSWORD: ${NEO4J_PASSWORD}
-        JWT_SECRET: ${JWT_SECRET}
+    environment:
+      spring_profiles_active: ${PROFILE}
+      JWT_SECRET: ${JWT_SECRET}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+
     ports:
       - "80:8080"
   graph-database:
     build:
       context: .
       dockerfile: docker/neo4j.dockerfile
-      args:
-        NEO4J_dbms_security_procedures_unrestricted: 'apoc.\\\*'
-        NEO4J_AUTH: ${NEO4J_AUTH}
+    environment:
+      NEO4J_dbms_security_procedures_unrestricted: 'apoc.\\\*'
+      NEO4J_AUTH: ${NEO4J_AUTH}
     ports:
       - "7474:7474"
       - "7687:7687"
