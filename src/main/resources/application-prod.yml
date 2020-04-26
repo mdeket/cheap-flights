@@ -5,7 +5,7 @@ logging:
                 springframework: INFO
 
 neo4j:
-    uri: http://graph-database:7474
+    uri: http://flight-advisor-lb-11685101.eu-central-1.elb.amazonaws.com:7474
     username: neo4j
 jwt:
     authoritiesKey: role
