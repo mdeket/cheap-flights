@@ -5,7 +5,7 @@ logging:
                 springframework: INFO
 
 neo4j:
-    uri: bolt://graph-database:7687
+    uri: http://graph-database:7474
     username: neo4j
 jwt:
     authoritiesKey: role

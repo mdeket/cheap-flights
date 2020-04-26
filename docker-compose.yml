@@ -4,7 +4,7 @@ services:
     # image: flight-advisor app
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/backend.dockerfile
       args:
         PROFILE: ${PROFILE}
         NEO4J_PASSWORD: ${NEO4J_PASSWORD}
@@ -12,15 +12,12 @@ services:
     ports:
       - "80:8080"
   graph-database:
-    image: neo4j:3.5
-    environment:
-      NEO4J_dbms_security_procedures_unrestricted: 'apoc.\\\*'
-      NEO4J_AUTH: ${NEO4J_AUTH}
+    build:
+      context: .
+      dockerfile: docker/neo4j.dockerfile
+      args:
+        NEO4J_dbms_security_procedures_unrestricted: 'apoc.\\\*'
+        NEO4J_AUTH: ${NEO4J_AUTH}
     ports:
       - "7474:7474"
       - "7687:7687"
-    volumes:
-      - plugins:/plugins
-
-volumes:
-  plugins:
