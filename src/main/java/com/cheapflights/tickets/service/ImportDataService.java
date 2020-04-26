@@ -145,7 +145,7 @@ public class ImportDataService {
         return CompletableFuture.completedFuture(null);
     }
 
-    @Async
+//    @Async
     public CompletableFuture<Void> loadRoutes(File file) {
         if (airportGraphRepository.count() == 0) {
             throw new AirportsNotImportedException("Please upload airports before routes.");
