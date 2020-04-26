@@ -1,0 +1,14 @@
+logging:
+  level:
+    org:
+      org:
+        springframework: DEBUG
+
+neo4j:
+  uri: bolt://graph-database:7687
+  username: neo4j
+  password: secret
+jwt:
+  authoritiesKey: role
+  tokenValidity: 10800000
+  secret: Cg7i4cOUKJMmMtaCAsGIeZDloIcVcjRcaKuJTej2meUfZmSd1RuaYFuBWup5tDi
