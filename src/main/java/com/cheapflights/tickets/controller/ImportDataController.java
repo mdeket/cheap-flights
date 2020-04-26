@@ -50,6 +50,7 @@ public class ImportDataController {
 
     private Void asyncExceptionHandler(Throwable e) {
         log.severe(e.getMessage());
+        e.printStackTrace();
         return null;
     }
 }
