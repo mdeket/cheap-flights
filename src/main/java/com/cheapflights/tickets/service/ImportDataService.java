@@ -7,6 +7,7 @@ import com.cheapflights.tickets.exception.AirportsNotImportedException;
 import com.cheapflights.tickets.repository.AirportRepository;
 import com.cheapflights.tickets.repository.graph.AirportGraphRepository;
 import com.cheapflights.tickets.service.graph.RouteGraphService;
+import com.cheapflights.tickets.service.mapper.AirportMapper;
 import com.cheapflights.tickets.service.mapper.graph.AirportGraphMapper;
 import com.cheapflights.tickets.service.mapper.graph.RouteGraphMapper;
 import lombok.extern.java.Log;
@@ -34,6 +35,7 @@ public class ImportDataService {
     private final AirportGraphRepository airportGraphRepository;
     private final AirportRepository airportRepository;
     private final AirportGraphMapper airportGraphMapper;
+    private final AirportMapper airportMapper;
     private final RouteGraphService routeGraphService;
     private final RouteGraphMapper routeGraphMapper;
     private final CityService cityService;
@@ -42,10 +44,11 @@ public class ImportDataService {
     private final Map<String, Airport> airportMapByIata;
     private final Map<String, Airport> airportMapByIcao;
 
-    public ImportDataService(AirportGraphRepository airportGraphRepository, AirportRepository airportRepository, AirportGraphMapper airportGraphMapper, RouteGraphService routeGraphService, RouteGraphMapper routeGraphMapper, CityService cityService, FileService fileService) {
+    public ImportDataService(AirportGraphRepository airportGraphRepository, AirportRepository airportRepository, AirportGraphMapper airportGraphMapper, AirportMapper airportMapper, RouteGraphService routeGraphService, RouteGraphMapper routeGraphMapper, CityService cityService, FileService fileService) {
         this.airportGraphRepository = airportGraphRepository;
         this.airportRepository = airportRepository;
         this.airportGraphMapper = airportGraphMapper;
+        this.airportMapper = airportMapper;
         this.routeGraphService = routeGraphService;
         this.routeGraphMapper = routeGraphMapper;
         this.cityService = cityService;
@@ -70,12 +73,7 @@ public class ImportDataService {
                     .description(graphAirport.getName())
                     .build();
 
-            com.cheapflights.tickets.domain.model.Airport airport =
-                    com.cheapflights.tickets.domain.model.Airport.builder()
-                            .externalId(graphAirport.getAirportExternalId())
-                            .name(graphAirport.getName())
-                            .build();
-
+            com.cheapflights.tickets.domain.model.Airport airport = airportMapper.fromGraphAirport(graphAirport);
 
             if (citiesWithAirports.containsKey(city.getName())) {
                 List<com.cheapflights.tickets.domain.model.Airport> airportList = citiesWithAirports.get(city.getName());
@@ -145,7 +143,7 @@ public class ImportDataService {
         return CompletableFuture.completedFuture(null);
     }
 
-//    @Async
+    @Async
     public CompletableFuture<Void> loadRoutes(File file) {
         if (airportGraphRepository.count() == 0) {
             throw new AirportsNotImportedException("Please upload airports before routes.");

@@ -52,8 +52,12 @@ public class CityService {
                         cityWithComments.put(cityDTO.getId(), cityDTO);
                     } else {
                         CityDTO existingCity = cityWithComments.get(cityDTO.getId());
-                        existingCity.getComments().add(commentDTO);
-                        existingCity.getAirports().add(airportDTO);
+                        if (commentDTO.getId() != null) {
+                            existingCity.getComments().add(commentDTO);
+                        }
+                        if (airportDTO.getExternalId() != null) {
+                            existingCity.getAirports().add(airportDTO);
+                        }
                         cityWithComments.replace(cityDTO.getId(), existingCity);
                     }
                 });

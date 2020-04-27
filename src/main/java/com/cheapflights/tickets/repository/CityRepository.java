@@ -18,7 +18,7 @@ public interface CityRepository extends CrudRepository<City, Long> {
      * @return Cities with limited number of comments as well as all airports that belong to the city.
      */
     @Query(value = "SELECT c.id as id, c.name as name, c.country as country, c.description as description, " +
-            "com.id as commentId, com.text as text, com.created_at as createdAt, com.modified_at as modifiedAt, com.author, " +
+            "com.id as commentId, com.text as text, com.created_at as createdAt, com.modified_at as modifiedAt, com.author as author, " +
             "a.name as airportName, a.external_id as externalAirportId " +
             "FROM city AS c " +
             "LEFT JOIN comment AS com ON com.id IN " +
@@ -33,7 +33,7 @@ public interface CityRepository extends CrudRepository<City, Long> {
      * @return Cities with all comments as well as all airports that belong to the city.
      */
     @Query(value = "SELECT c.id as id, c.name as name, c.country as country, c.description as description, " +
-            "com.id as commentId, com.text as text, com.created_at as createdAt, com.modified_at as modifiedAt, " +
+            "com.id as commentId, com.text as text, com.created_at as createdAt, com.modified_at as modifiedAt, com.author as author, " +
             "a.name as airportName, a.external_id as externalAirportId " +
             "FROM city AS c " +
             "LEFT JOIN comment AS com ON com.id IN " +

@@ -6,6 +6,8 @@ import com.cheapflights.tickets.service.CommentService;
 import com.cheapflights.tickets.service.mapper.CommentMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -36,14 +38,16 @@ public class CommentController {
         return ResponseEntity.ok(commentMapper.toDTO(comments));
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO, @PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, userId));
+    @PostMapping
+    public ResponseEntity<CommentDTO> addComment(@RequestBody CommentDTO commentDTO, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(commentDTO, user));
     }
 
     @PutMapping
-    public ResponseEntity<CommentDTO> updateComment(@RequestBody CommentDTO commentDTO) {
-        return ResponseEntity.ok(commentService.update(commentDTO, 4l));
+    public ResponseEntity<CommentDTO> updateComment(@RequestBody CommentDTO commentDTO, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(commentService.update(commentDTO, user));
     }
 
     @DeleteMapping("/{commentId}")

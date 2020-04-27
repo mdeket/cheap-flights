@@ -11,11 +11,10 @@ import java.util.stream.Collectors;
 @Component
 public class AirportMapper {
 
-    // TODO: use this!
     public Airport fromGraphAirport(com.cheapflights.tickets.domain.model.graph.Airport graphAirport) {
         return Airport.builder()
                 .externalId(graphAirport.getAirportExternalId())
-                .name(graphAirport.getCity())
+                .name(graphAirport.getName())
                 .build();
     }
 

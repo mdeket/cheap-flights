@@ -42,12 +42,6 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-    // TODO: delete this
-    @NotNull
-    @Size(min = 1, max = 100)
-    @JsonIgnore
-    private String salt;
-
     @NotNull(message = "role must not be null.")
     @Enumerated(EnumType.STRING)
     private AuthorityConstants role;
@@ -56,13 +50,12 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Comment> comments;
 
-    public User(Long id, @NotNull @Size(min = 4, max = 50) String username, @NotNull @Size(min = 1, max = 30) String firstName, @NotNull @Size(min = 1, max = 30) String lastName, @NotNull @Size(min = 4, max = 128) String password, @NotNull @Size(min = 1, max = 100) String salt, @NotNull AuthorityConstants role, List<Comment> comments) {
+    public User(Long id, @NotNull @Size(min = 4, max = 50) String username, @NotNull @Size(min = 1, max = 30) String firstName, @NotNull @Size(min = 1, max = 30) String lastName, @NotNull @Size(min = 4, max = 128) String password, @NotNull AuthorityConstants role, List<Comment> comments) {
         this.id = id;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        this.salt = salt;
         this.role = role;
         this.comments = comments;
     }
@@ -102,7 +95,6 @@ public class User implements UserDetails {
         private @NotNull @Size(min = 1, max = 30) String firstName;
         private @NotNull @Size(min = 1, max = 30) String lastName;
         private @NotNull @Size(min = 4, max = 128) String password;
-        private @NotNull @Size(min = 1, max = 100) String salt;
         private @NotNull AuthorityConstants role;
         private List<Comment> comments;
 
@@ -134,11 +126,6 @@ public class User implements UserDetails {
             return this;
         }
 
-        public UserBuilder salt(@NotNull @Size(min = 1, max = 100) String salt) {
-            this.salt = salt;
-            return this;
-        }
-
         public UserBuilder role(@NotNull AuthorityConstants role) {
             this.role = role;
             return this;
@@ -150,11 +137,11 @@ public class User implements UserDetails {
         }
 
         public User build() {
-            return new User(id, username, firstName, lastName, password, salt, role, comments);
+            return new User(id, username, firstName, lastName, password, role, comments);
         }
 
         public String toString() {
-            return "User.UserBuilder(id=" + this.id + ", username=" + this.username + ", firstName=" + this.firstName + ", lastName=" + this.lastName + ", password=" + this.password + ", salt=" + this.salt + ", role=" + this.role + ", comments=" + this.comments + ")";
+            return "User.UserBuilder(id=" + this.id + ", username=" + this.username + ", firstName=" + this.firstName + ", lastName=" + this.lastName + ", password=" + this.password + ", role=" + this.role + ", comments=" + this.comments + ")";
         }
     }
 }

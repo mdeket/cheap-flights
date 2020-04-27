@@ -1,0 +1,1 @@
+INSERT INTO "user" ("id", "first_name", "last_name", "username", "password", "role") VALUES (1, 'Tony', 'Stark', 'ironman', '$2a$10$tOhHWuIzxHNAxRm/pKVXDu227GRtgGyaw9luquIWb3vpgJdkXzcwG', 'ROLE_ADMIN');

@@ -30,12 +30,15 @@ public class UserService {
         User user = userMapper.toEntity(userDTO);
         String salt = BCrypt.gensalt();
         String hashedPassword = BCrypt.hashpw(userDTO.getPassword(), salt);
-        user.setSalt(salt);
         user.setPassword(hashedPassword);
         return userRepository.save(user);
     }
 
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(EntityNotFoundException::new);
     }
 }

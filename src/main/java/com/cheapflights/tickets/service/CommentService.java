@@ -29,13 +29,11 @@ public class CommentService {
         this.cityService = cityService;
     }
 
-    public CommentDTO save(CommentDTO commentDTO, Long userId) {
+    public CommentDTO save(CommentDTO commentDTO, org.springframework.security.core.userdetails.User user) {
         City city = cityService.findOne(commentDTO.getCity());
-
-        User user = userService.findById(userId);
-
+        User author = userService.findByUsername(user.getUsername());
         Comment comment = Comment.builder()
-                .author(user)
+                .author(author)
                 .text(commentDTO.getText())
                 .createdAt(commentDTO.getCreatedAt())
                 .modifiedAt(commentDTO.getModifiedAt())
@@ -49,14 +47,15 @@ public class CommentService {
         return commentMapper.toDTO(commentRepository.save(comment));
     }
 
-    public CommentDTO update(CommentDTO commentDTO, Long userId) {
+    public CommentDTO update(CommentDTO commentDTO, org.springframework.security.core.userdetails.User user) {
         if (commentDTO.getId() == null) {
             throw new UpdateEntityException("Can't update comment with id missing.");
         }
         Comment comment = findById(commentDTO.getId());
         commentDTO.setCreatedAt(comment.getCreatedAt());
         commentDTO.setModifiedAt(comment.getModifiedAt());
-        return save(commentDTO, userId);
+        commentDTO.setCity(comment.getCity().getId());
+        return save(commentDTO, user);
     }
 
     public void deleteComment(Long id) {

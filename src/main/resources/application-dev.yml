@@ -5,8 +5,7 @@ logging:
                 springframework: DEBUG
 
 neo4j:
-#    uri: bolt://localhost:7687
-    uri: http://flight-advisor-lb-11685101.eu-central-1.elb.amazonaws.com:7474
+    uri: bolt://localhost:7687
     username: neo4j
     password: secret
 jwt:
