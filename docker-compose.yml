@@ -10,7 +10,7 @@ services:
       NEO4J_PASSWORD: ${NEO4J_PASSWORD}
 
     ports:
-      - "80:8080"
+      - "8080:8080"
   graph-database:
     build:
       context: .

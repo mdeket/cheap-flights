@@ -48,7 +48,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .apply(securityConfigurerAdapter());
 
-        // Adds a filter to validate the tokens with every request
     }
 
     private JwtConfigurer securityConfigurerAdapter() {
