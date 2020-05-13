@@ -83,14 +83,8 @@ chmod +x docker-compose.sh
 If you have completed all this you can use postman, curl or any other tool to send request to the API. The same as in dev profile app is on port 8080 and database gui can be found on port 7474.
 
 ### **Prod** profile
-This profile is used for AWS. The whole project is deployed on AWS using ECS services, Secrets Manager and ECR. The provided credentials will allow you to 
-go through these services and CloudWatch as well, however, you only have permission to read services and values. 
+This profile is used for AWS. The whole project is deployed on AWS using ECS services, Secrets Manager and ECR.
 As CI/CD I used jenkins. After the build Jenkins will push the new version of docker container to ECR. ECS service will read that event and try to replace an existing container with the new one.
-For now you can find the api on this URL:
-```
-http://flight-advisor-lb-11685101.eu-central-1.elb.amazonaws.com
-```
-*url can also be found in postman collection -> envronment -> FlightAdvisor -> host -> initial value.
 
 In this case you can't use Neo4j's GUI. It can only be reached and login screen opened on the same address with 7474 port,
  but in order to authenticate and continue using it Neo4j GUI client uses their own Bolt protocol which relies on websocket, but 
@@ -98,8 +92,7 @@ In this case you can't use Neo4j's GUI. It can only be reached and login screen 
 
 ### Jenkinsfile & Jenkins
 Jenkins has been set up on a clean AWS EC2 instance with IAM role that has access to ECR. A pipeline project on Jenkins is used for this project. Jenkins has a webhook on GitHub push events, so every time a change is pushed to GitHub, Jenkins will pull _master_ 
-branch, build database and api containers and push them to ECR. Using provided credentials you can login to 
-jenkins and see the whole setup. Url: http://jenkins.htec.qubit.rs
+branch, build database and api containers and push them to ECR.
 
 ### Terraform
 However, not 100% finished, only networking is ready, there are still ECS tasks, services and roles missing.
